@@ -61,7 +61,7 @@
 - name: Validate sysctl settings
   block:
     - name: Check valid sysctl settings
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: "sysctl -n {{ item.key }} || true"
       register: sysctl_check
       loop: "{{ emqx_sysctl_settings | dict2items }}"
@@ -129,7 +129,7 @@
   when: container_info is defined
   changed_when: false
 
-- name: Ensure EMQX service's restart ok
+- name: Ensure EMQX service's restart ok # noqa: no-handler
   ansible.builtin.service:
     name: emqx
     state: restarted
@@ -152,6 +152,10 @@
   retries: 10
   delay: 5
   changed_when: false
+
+- name: Insatall Guard-pro plugin
+  ansible.builtin.include_tasks: plugins.yml
+  tags: [plugins]
 
 - name: Print cluster status on retry failure
   ansible.builtin.debug:

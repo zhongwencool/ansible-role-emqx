@@ -82,3 +82,46 @@ emqx_etcd_servers:
   - http://etcd-server-3:2379
 emqx_etcd_prefix: emqxctl
 emqx_etcd_node_ttl: 90s
+
+emqx_guard_pro_enabled: false
+emqx_guard_pro_license: "default"
+
+# SMTP settings
+# https://guard.emqx.dev/guide/configuration/gmail.html
+# https://guard.emqx.dev/guide/configuration/qqmail.html
+emqx_guard_pro_smtp_enable: false
+emqx_guard_pro_smtp_host: ""
+emqx_guard_pro_smtp_user: ""
+emqx_guard_pro_smtp_password: ""
+emqx_guard_pro_smtp_from_address: ""
+emqx_guard_pro_smtp_to_address: ""
+emqx_guard_pro_smtp_skip_verify: true
+
+# Slack settings
+# https://guard.emqx.dev/guide/configuration/slack.html
+emqx_guard_pro_slack_enable: false
+emqx_guard_pro_slack_webhook: ""
+emqx_guard_pro_slack_channel: ""
+emqx_guard_pro_slack_token: ""
+
+# Dingtalk settings
+# https://guard.emqx.dev/guide/configuration/dingtalk.html
+emqx_guard_pro_dingtalk_enable: false
+emqx_guard_pro_dingtalk_webhook: ""
+emqx_guard_pro_dingtalk_secret: ""
+emqx_guard_pro_dingtalk_at_mobiles: ""
+
+# Wechat settings
+# https://guard.emqx.dev/guide/configuration/wechat.html
+emqx_guard_pro_wechat_enable: false
+emqx_guard_pro_wechat_webhook: ""
+emqx_guard_pro_wechat_secret: ""
+emqx_guard_pro_wechat_at_mobiles: ""
+
+# Feishu settings
+# https://guard.emqx.dev/guide/configuration/feishu.html
+emqx_guard_pro_feishu_enable: false
+emqx_guard_pro_feishu_webhook: ""
+emqx_guard_pro_feishu_secret: ""
+emqx_guard_pro_feishu_template_version_name: ""
+emqx_guard_pro_feishu_template_id: ""

@@ -8,3 +8,8 @@
   ansible.builtin.service:
     name: chronyd
     state: restarted
+
+- name: Restart Guard-pro
+  ansible.builtin.command: emqx_ctl plugins restart emqx_guard_pro-{{ guard_pro_version }}
+  changed_when: "'successfully' in restart_result.stdout"
+  register: restart_result

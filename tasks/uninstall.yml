@@ -24,6 +24,7 @@
     - /var/log/emqx
     - /usr/lib/emqx
     - /tmp/emqx-{{ emqx_version }}
+    - /tmp/emqx-plugins
 
 - name: Remove repository configuration
   ansible.builtin.file:

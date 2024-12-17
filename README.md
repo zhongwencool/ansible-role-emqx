@@ -6,8 +6,8 @@ An Ansible Role that installs and configures EMQX 5.x on Linux.
 
 ## Requirements
 
-- Ansible 2.9 or higher
-- Supported OS: Debian 10/11/12, Ubuntu 20.04/22.04, Rocky Linux 8/9, Amazon Linux 2/2023
+- Ansible 2.18.1 or higher
+- Supported OS: Debian 11/12, Ubuntu 20.04/22.04, Rocky Linux 8/9, Amazon Linux 2/2023
 
 ## Role Variables
 
@@ -25,7 +25,6 @@ None.
 
 ## TODO
 - Guard-pro plugin installation
-- github ci
 - Update configuration interface
 - update to ansible-galaxy
  
