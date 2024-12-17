@@ -30,7 +30,12 @@
     path: "{{ repo_path }}"
     state: absent
   vars:
-    repo_path: "{{ '/etc/apt/sources.list.d/emqx.list' if ansible_os_family == 'Debian' else '/etc/yum.repos.d/emqx.repo' }}"
+    repo_path: >-
+      {{
+        '/etc/apt/sources.list.d/emqx.list'
+        if ansible_os_family == 'Debian'
+        else '/etc/yum.repos.d/emqx.repo'
+      }}
 
 - name: Clean package cache
   ansible.builtin.command: "{{ cache_clean_cmd }}"
@@ -38,5 +43,6 @@
     LANG: C
     LC_ALL: C
   vars:
-    cache_clean_cmd: "{{ 'apt-get clean' if ansible_os_family == 'Debian' else 'yum clean all' }}"
+    cache_clean_cmd: >-
+      {{ 'apt-get clean' if ansible_os_family == 'Debian' else 'yum clean all' }}
   changed_when: false

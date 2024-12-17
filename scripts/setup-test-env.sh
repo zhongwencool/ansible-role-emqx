@@ -25,6 +25,18 @@ ansible-galaxy collection install -r meta/requirements.yml
 # Run linting checks
 echo -e "\n${YELLOW}Running linting checks...${NC}"
 
+# Print tool versions
+echo -e "\n${YELLOW}Tool versions:${NC}"
+echo -n "yamllint version: "
+yamllint --version
+
+echo -n "ansible version: "
+ansible --version | head -n1
+
+echo -n "molecule version: "
+molecule --version
+
+# Continue with linting checks
 echo -n "Running yamllint... "
 if yamllint . > /dev/null 2>&1; then
     echo -e "${GREEN}OK${NC}"

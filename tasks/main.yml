@@ -23,7 +23,8 @@
       {%- else -%}
         {%- if inventory_hostname is match("emqx\\d+.*") -%}
         {%- set lookup_key = inventory_hostname | regex_replace('^(emqx\\d+).*$', '\\1') + '-test' -%}
-        {{- hostvars[inventory_hostname]['molecule_yml']['provisioner']['inventory']['host_vars'][lookup_key]['emqx_hostname'] -}}
+        {%- set host_vars = hostvars[inventory_hostname]['molecule_yml']['provisioner']['inventory']['host_vars'] -%}
+        {{- host_vars[lookup_key]['emqx_hostname'] -}}
         {%- else -%}
         {{- emqx_hostname | default(inventory_hostname) -}}
         {%- endif -%}
@@ -32,8 +33,7 @@
 - name: Set cluster seeds from all nodes
   ansible.builtin.set_fact:
     emqx_cluster_seeds: >-
-      [{%- for host in groups['all'] -%}'emqx@{{ hostvars[host].emqx_hostname }}'{%- if not loop.last -%},{% endif -%}{%- endfor -%}]
-
+      [{%- for host in groups['all'] -%}'emqx@{{ hostvars[host].emqx_hostname }}'{%- if not loop.last -%},{%- endif -%}{%- endfor -%}]
 
 - name: Ensure EMQX user exists
   ansible.builtin.user:
@@ -120,37 +120,38 @@
     backup: yes
 
 - name: Ensure systemd is up-to-date with the latest unit files
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
 
 - name: Ensure EMQX service's restart ok
   ansible.builtin.service:
     name: emqx
     state: restarted
-    enabled: "{{ emqx_service_enabled }}"    
+    enabled: "{{ emqx_service_enabled }}"
 
 - name: Wait for EMQX tcp port to be ready
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ emqx_tcp_port }}"
     timeout: 3000
   when: emqx_tcp_port != 0
 
 - name: Wait for cluster formation
-  command: emqx ctl cluster status --json
+  ansible.builtin.command: emqx ctl cluster status --json
   register: cluster_status
   until: >
     (cluster_status.stdout | from_json).running_nodes | length ==
     (emqx_cluster_seeds | length)
   retries: 10
   delay: 5
+  changed_when: false
 
 - name: Print cluster status on retry failure
-  debug:
+  ansible.builtin.debug:
     msg: "Cluster formation failed after retries. Current status: {{ cluster_status.stdout }}"
   when: cluster_status is failed
 
 - name: Display cluster status
-  debug:
+  ansible.builtin.debug:
     var: cluster_status.stdout_lines
 
 - name: Ensure EMQX service's state

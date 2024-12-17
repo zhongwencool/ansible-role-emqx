@@ -9,13 +9,16 @@
   ansible.builtin.set_fact:
     pkg_arch: "{% if ansible_architecture == 'aarch64' %}arm64{% else %}amd64{% endif %}"
     pkg_name: >-
-      emqx-{{ emqx_version }}-{% if ansible_distribution | lower == 'debian' %}debian{{ ansible_distribution_major_version }}{% else %}ubuntu{{ ansible_distribution_version }}{% endif %}
+      emqx-{{ emqx_version }}-{%- if ansible_distribution | lower == 'debian' -%}debian{{ ansible_distribution_major_version }}{%- else -%}ubuntu{{ ansible_distribution_version }}{%- endif -%}
 
 - name: Set package path and URLs
   ansible.builtin.set_fact:
-    pkg_path: "/tmp/emqx-{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb"
-    pkg_url: "https://www.emqx.com/en/downloads/broker/{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb"
-    pkg_checksum_url: "https://www.emqx.com/en/downloads/broker/{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb.sha256"
+    pkg_path: >-
+      /tmp/emqx-{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb
+    pkg_url: >-
+      https://www.emqx.com/en/downloads/broker/{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb
+    pkg_checksum_url: >-
+      https://www.emqx.com/en/downloads/broker/{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.deb.sha256
 
 - name: Get package checksum
   ansible.builtin.set_fact:

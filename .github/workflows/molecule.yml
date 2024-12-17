@@ -4,10 +4,10 @@ name: Molecule Test
 on:
   push:
     branches:
-      - main      
+      - main
   pull_request:
     branches:
-      - main      
+      - main
   schedule:
     - cron: '0 6 * * 0'  # Run every Sunday at 6 AM UTC
 
@@ -34,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       - name: Install dependencies
         run: |
@@ -43,12 +43,16 @@ jobs:
 
       - name: Display versions
         run: |
+          python3 -m venv venv
+          source venv/bin/activate
           python --version
           ansible --version
           molecule --version
 
       - name: Run Molecule tests
         run: |
+          python3 -m venv venv
+          source venv/bin/activate
           MOLECULE_DISTRO=${{ matrix.distro }} molecule test
         env:
           PY_COLORS: '1'
@@ -64,4 +68,4 @@ jobs:
           path: |
             molecule/default/molecule.yml
             molecule/default/*.log
-            molecule/default/reports/ 
+            molecule/default/reports/
