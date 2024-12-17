@@ -58,14 +58,30 @@
     - /var/lib/emqx
     - /var/log/emqx
 
-- name: Configure system settings
-  ansible.posix.sysctl:
-    name: "{{ item.key }}"
-    value: "{{ item.value }}"
-    state: present
-    sysctl_set: yes
-    reload: yes
-  with_dict: "{{ emqx_sysctl_settings }}"
+- name: Validate sysctl settings
+  block:
+    - name: Check valid sysctl settings
+      ansible.builtin.shell: 
+        cmd: "sysctl -n {{ item.key }} || true"
+      register: sysctl_check
+      loop: "{{ emqx_sysctl_settings | dict2items }}"
+      changed_when: false
+      failed_when: false
+
+    - name: Filter valid sysctl settings
+      ansible.builtin.set_fact:
+        valid_sysctl_settings: "{{ emqx_sysctl_settings | dict2items | selectattr('key', 'in', sysctl_check.results | selectattr('stdout', 'ne', '') | map(attribute='item') | map(attribute='key') | list) }}"
+
+    - name: Configure system settings
+      ansible.posix.sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+        sysctl_set: yes
+        reload: yes
+      loop: "{{ valid_sysctl_settings }}"
+      loop_control:
+        label: "{{ item.key }}"
 
 - name: Create EMQX configuration
   ansible.builtin.template:
