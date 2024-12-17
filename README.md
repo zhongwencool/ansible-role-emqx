@@ -1,5 +1,7 @@
 # Ansible Role: EMQX
 
+[![Molecule Test](https://github.com/zhongwencool/ansible-role-emqx/actions/workflows/molecule.yml/badge.svg)](https://github.com/zhongwencool/ansible-role-emqx/actions/workflows/molecule.yml)
+
 An Ansible Role that installs and configures EMQX 5.x on Linux.
 
 ## Requirements
@@ -25,7 +27,8 @@ None.
 - Guard-pro plugin installation
 - github ci
 - Update configuration interface
-
+- update to ansible-galaxy
+ 
 - Web interface for inventory generation
 - host generator.
 - SSL certificate management
