@@ -1,0 +1,10 @@
+---
+- name: Restart EMQX
+  ansible.builtin.service:
+    name: emqx
+    state: restarted
+
+- name: Restart Chronyd
+  ansible.builtin.service:
+    name: chronyd
+    state: restarted

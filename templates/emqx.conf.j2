@@ -1,0 +1,54 @@
+## TODO: add explanation url to emqx docs
+node {
+    name = "emqx@{{ emqx_hostname }}"
+    cookie = "{{ emqx_cookie }}"
+    data_dir = "/var/lib/emqx"
+}
+
+cluster {
+    name = "{{ emqx_cluster_name }}"
+    discovery_strategy = "{{ emqx_discovery_strategy }}"
+    {% if emqx_discovery_strategy == "etcd" %}
+    etcd {
+        servers = "{{ emqx_etcd_servers | join(',') }}"
+        prefix = "{{ emqx_etcd_prefix }}"
+        node_ttl = "{{ emqx_etcd_node_ttl }}"
+    }
+    {% endif %}
+    {% if emqx_discovery_strategy == "static" %}
+    static {
+        seeds = [
+            {% for host in emqx_cluster_seeds %}
+            "{{ host }}"{{ "," if not loop.last else "" }}
+            {% endfor %}
+        ]
+    }
+    {% endif %}
+}
+
+listeners.tcp.default {
+    bind = "0.0.0.0:{{ emqx_tcp_port }}"
+    max_connections = infinity
+}
+
+{% if emqx_ssl_enabled %}
+listeners.ssl.default {
+    bind = "0.0.0.0:{{ emqx_ssl_port }}"
+    ssl_options {
+        certfile = "{{ emqx_ssl_certfile }}"
+        keyfile = "{{ emqx_ssl_keyfile }}"
+    }
+    max_connections = infinity
+}
+{% endif %}
+
+listeners.ws.default {
+    bind = "0.0.0.0:{{ emqx_ws_port }}"
+    max_connections = infinity
+}
+
+dashboard {
+    listeners.http {
+        bind = "0.0.0.0:{{ emqx_dashboard_port }}"
+    }
+} 

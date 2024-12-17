@@ -1,0 +1,34 @@
+---
+- name: Install and configure EMQX
+  hosts: all
+  become: true
+  vars:
+    # EMQX version
+    emqx_version: "5.8.3"
+
+    # Service configuration
+    emqx_service_state: started
+    emqx_service_enabled: true
+
+    # Basic settings
+    emqx_user: emqx
+    emqx_group: emqx
+    emqx_user_home: /var/lib/emqx
+
+    # Cluster configuration
+    emqx_cluster_name: emqx_cluster
+    emqx_discovery_strategy: static
+
+    # Port settings
+    emqx_tcp_port: 1883
+    emqx_ssl_port: 8883
+    emqx_ws_port: 8083
+    emqx_dashboard_port: 18083
+
+    # SSL settings (if needed)
+    emqx_ssl_enabled: false
+    # emqx_ssl_certfile: "/path/to/cert.pem"
+    # emqx_ssl_keyfile: "/path/to/key.pem"
+
+  roles:
+    - role: ../../ansible-role-emqx

@@ -1,0 +1,9 @@
+---
+- name: Uninstall EMQX
+  hosts: all
+  become: true
+  tasks:
+    - name: Uninstall EMQX
+      ansible.builtin.include_role:
+        name: ansible-role-emqx
+        tasks_from: uninstall

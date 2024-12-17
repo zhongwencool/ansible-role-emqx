@@ -1,0 +1,34 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: emqx
+  author: zhongwencool
+  description: Install and configure EMQX 5 broker cluster
+  license: MIT
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Ubuntu  # Ubuntu Linux distributions
+      versions:
+        - focal    # Ubuntu 20.04 LTS
+        - jammy    # Ubuntu 22.04 LTS
+    - name: Debian  # Debian Linux distributions
+      versions:
+        - bullseye  # Debian 11
+        - bookworm  # Debian 12
+    - name: EL      # Enterprise Linux (RedHat/CentOS)
+      versions:
+        - "8"       # RHEL/CentOS 8
+        - "9"       # RHEL/CentOS 9
+    - name: Amazon Linux  # Amazon Linux distributions
+      versions:
+        - "2023"    # Amazon Linux 2023
+        - "2"       # Amazon Linux 2
+  galaxy_tags:
+    - emqx
+    - mqtt
+    - broker
+    - messaging
+    - queue
+    - hardening
+    - security

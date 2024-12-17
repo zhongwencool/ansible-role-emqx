@@ -1,0 +1,46 @@
+---
+- name: Set OS-specific variables
+  ansible.builtin.set_fact:
+    locale_file_path: /etc/default/locale
+    chrony_conf_path: /etc/chrony/chrony.conf
+
+- name: Install required dependencies
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - libssl-dev
+      - libncurses5-dev
+      - curl
+      - gnupg
+      - locales
+      - ufw
+      - chrony
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  register: apt_install_deps_result
+  become: true
+
+- name: Display package installation results
+  ansible.builtin.debug:
+    var: apt_install_deps_result
+    verbosity: 1
+
+- name: Generate locale
+  ansible.builtin.command: locale-gen {{ emqx_locale }}
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "{{ emqx_hostname }}"
+  become: true
+  when: ansible_service_mgr == 'systemd' and ansible_virtualization_type != 'docker'
+  ignore_errors: true
+
+- name: Include common tasks
+  ansible.builtin.include_tasks: common.yml
+
+- name: Setup EMQX package
+  ansible.builtin.include_tasks: packages/debian.yml

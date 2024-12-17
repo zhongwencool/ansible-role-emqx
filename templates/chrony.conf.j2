@@ -1,0 +1,34 @@
+# Use public NTP servers from the pool.ntp.org project
+server 0.pool.ntp.org iburst
+server 1.pool.ntp.org iburst
+server ntp.aliyun.com iburst
+server cn.pool.ntp.org iburst
+server time.google.com iburst
+server ntp.ntsc.ac.cn iburst
+
+# Record the rate at which the system clock gains/losses time
+driftfile /var/lib/chrony/drift
+
+# Allow the system clock to be stepped in the first three updates
+makestep 1.0 3
+
+# Enable kernel synchronization of the real-time clock (RTC)
+rtcsync
+
+# Enable hardware timestamping on all interfaces that support it
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust
+# the system clock
+#minsources 2
+
+# Allow NTP client access from local network
+allow 192.168.0.0/16
+allow 172.16.0.0/12
+allow 10.0.0.0/8
+
+# Serve time even if not synchronized to a time source
+local stratum 10
+
+# Specify directory for log files
+logdir /var/log/chrony 

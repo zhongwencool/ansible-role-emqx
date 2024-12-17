@@ -1,0 +1,42 @@
+---
+# Stop and disable EMQX service
+- name: Stop and disable EMQX service
+  ansible.builtin.service:
+    name: emqx
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: Remove EMQX package
+  ansible.builtin.package:
+    name: emqx
+    state: absent
+  vars:
+    ansible_pkg_mgr: "{{ 'apt' if ansible_os_family == 'Debian' else 'dnf' }}"
+
+- name: Remove EMQX directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/emqx
+    - /var/lib/emqx
+    - /var/log/emqx
+    - /usr/lib/emqx
+    - /tmp/emqx-{{ emqx_version }}
+
+- name: Remove repository configuration
+  ansible.builtin.file:
+    path: "{{ repo_path }}"
+    state: absent
+  vars:
+    repo_path: "{{ '/etc/apt/sources.list.d/emqx.list' if ansible_os_family == 'Debian' else '/etc/yum.repos.d/emqx.repo' }}"
+
+- name: Clean package cache
+  ansible.builtin.command: "{{ cache_clean_cmd }}"
+  environment:
+    LANG: C
+    LC_ALL: C
+  vars:
+    cache_clean_cmd: "{{ 'apt-get clean' if ansible_os_family == 'Debian' else 'yum clean all' }}"
+  changed_when: false

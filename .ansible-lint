@@ -1,0 +1,13 @@
+---
+exclude_paths:
+  - .cache/
+  - .github/
+  - .tox/
+  - .venv/
+  - venv/
+  - molecule/
+  - tests/
+
+skip_list:
+  - yaml
+  - role-name 

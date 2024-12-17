@@ -1,0 +1,94 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: emqx1-${MOLECULE_DISTRO:-debian11}
+    image: ${MOLECULE_IMAGE:-geerlingguy/docker-debian11-ansible:latest}
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+    exposed_ports:
+      - 1883/tcp
+      - 8883/tcp
+      - 8083/tcp
+      - 8084/tcp
+      - 18083/tcp
+    published_ports:
+      - 0:1883
+      - 0:8883
+      - 0:8083
+      - 0:8084
+      - 0:18083
+
+  - name: emqx2-${MOLECULE_DISTRO:-debian11}
+    image: ${MOLECULE_IMAGE:-geerlingguy/docker-debian11-ansible:latest}
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+    exposed_ports:
+      - 1883/tcp
+      - 8883/tcp
+      - 8083/tcp
+      - 8084/tcp
+      - 18083/tcp
+    published_ports:
+      - 0:1883
+      - 0:8883
+      - 0:8083
+      - 0:8084
+      - 0:18083
+
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_FORCE_COLOR: "true"
+    ANSIBLE_FORKS: "2"
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks, timer, yaml
+      remote_tmp: /tmp
+      allow_world_readable_tmpfiles: true
+  inventory:
+    group_vars:
+      all:
+        emqx_cookie: "molecule_test_cookie"
+        ansible_user: root
+        emqx_tcp_port: 1883
+        emqx_ssl_port: 8883
+        emqx_ws_port: 8083
+        emqx_wss_port: 8084
+        emqx_dashboard_port: 18083
+        emqx_discovery_strategy: static
+    host_vars:
+      "emqx1-test":
+        emqx_hostname: "s1.molecule"
+      "emqx2-test":
+        emqx_hostname: "s2.molecule"
+  playbooks:
+    converge: converge.yml
+
+verifier:
+  name: ansible
+
+scenario:
+  name: default
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify
+    - cleanup
+    - destroy

@@ -1,0 +1,51 @@
+---
+- name: Check if requested locale is available
+  ansible.builtin.shell: |
+    set -o pipefail
+    locale -a | grep -q '^{{ emqx_locale }}$'
+  register: locale_check
+  changed_when: false
+  failed_when: false
+
+- name: Set locale variable with fallback
+  ansible.builtin.set_fact:
+    effective_locale: "{{ emqx_locale if locale_check.rc == 0 else 'C.UTF-8' }}"
+
+- name: Set locale
+  ansible.builtin.copy:
+    content: |
+      LANG={{ effective_locale }}
+      LANGUAGE={{ emqx_language }}
+      LC_ALL={{ effective_locale }}
+    dest: "{{ locale_file_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Set hostname in /etc/hostname
+  ansible.builtin.shell: |
+    echo "{{ emqx_hostname }}" > /etc/hostname
+    hostname "{{ emqx_hostname }}"
+  when: ansible_service_mgr != 'systemd' or ansible_virtualization_type == 'docker'
+  changed_when: false
+
+- name: Update /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "^127.0.1.1(.*)$"
+    line: "127.0.1.1\\1 {{ emqx_hostname }}"
+    state: present
+    backrefs: yes
+
+- name: Configure chrony
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: "{{ chrony_conf_path }}"
+    mode: '0644'
+  notify: Restart Chronyd
+
+- name: Ensure chronyd service is running
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: yes

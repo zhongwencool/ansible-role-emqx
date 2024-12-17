@@ -1,0 +1,140 @@
+---
+- name: Check if firewalld is installed (RedHat family)
+  ansible.builtin.command: which firewall-cmd
+  register: firewalld_check
+  ignore_errors: true
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+  tags: ['firewall']
+
+- name: Check if ufw is installed (Debian family)
+  ansible.builtin.command: which ufw
+  register: ufw_check
+  ignore_errors: true
+  changed_when: false
+  when: ansible_os_family == "Debian"
+  tags: ['firewall']
+
+- name: Ensure firewalld is running (RedHat family)
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - firewalld_check.rc == 0
+  tags: ['firewall']
+
+- name: Ensure UFW is enabled (Debian family)
+  community.general.ufw:
+    state: enabled
+    policy: deny
+  when:
+    - ansible_os_family == "Debian"
+    - ufw_check.rc == 0
+  tags: ['firewall']
+
+# Allow SSH access first to prevent lockout
+- name: Allow SSH access (UFW)
+  community.general.ufw:
+    rule: allow
+    port: ssh
+    proto: tcp
+  when:
+    - ansible_os_family == "Debian"
+    - ufw_check.rc == 0
+  tags: ['firewall']
+
+- name: Allow SSH access (firewalld)
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: yes
+    state: enabled
+    immediate: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - firewalld_check.rc == 0
+  tags: ['firewall']
+
+- name: Set cluster configuration
+  ansible.builtin.set_fact:
+    emqx_cluster_ips: "{{ groups['all'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+  run_once: true
+  tags: ['firewall']
+
+- name: Configure firewalld (RedHat family)
+  ansible.posix.firewalld:
+    rich_rule: >
+      rule family="ipv4"
+      source address="{{ item[0] }}"
+      port port="{{ item[1] }}" protocol="tcp"
+      accept
+    permanent: yes
+    state: enabled
+    immediate: yes
+  with_nested:
+    - "{{ emqx_cluster_ips }}"
+    - "{{ emqx_cluster_rpc_ports }}"
+  when:
+    - ansible_os_family == "RedHat"
+    - firewalld_check.rc == 0
+  tags: ['firewall']
+
+- name: Configure UFW (Debian family)
+  community.general.ufw:
+    rule: allow
+    port: "{{ item[1] }}"
+    proto: tcp
+    from_ip: "{{ item[0] }}"
+  with_nested:
+    - "{{ emqx_cluster_ips }}"
+    - "{{ emqx_cluster_rpc_ports }}"
+  when:
+    - ansible_os_family == "Debian"
+    - ufw_check.rc == 0
+  tags: ['firewall']
+
+- name: Ensure iptables packages are installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iptables
+    - iptables-persistent
+  when: >
+    (ansible_os_family == "RedHat" and firewalld_check.rc != 0) or
+    (ansible_os_family == "Debian" and ufw_check.rc != 0)
+  tags: ['firewall']
+
+- name: Configure iptables
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    source: "{{ item[0] }}"
+    destination_port: "{{ item[1] }}"
+    jump: ACCEPT
+    comment: "EMQX cluster RPC port from {{ item[0] }}"
+  with_nested:
+    - "{{ emqx_cluster_ips }}"
+    - "{{ emqx_cluster_rpc_ports }}"
+  when: >
+    (ansible_os_family == "RedHat" and firewalld_check.rc != 0) or
+    (ansible_os_family == "Debian" and ufw_check.rc != 0)
+  tags: ['firewall']
+
+- name: Save iptables rules (Debian)
+  ansible.builtin.command: netfilter-persistent save
+  when: >
+    ansible_os_family == "Debian" and
+    ufw_check.rc != 0
+  changed_when: false
+  tags: ['firewall']
+
+- name: Save iptables rules (RedHat)
+  ansible.builtin.service:
+    name: iptables
+    state: saved
+  when: >
+    ansible_os_family == "RedHat" and
+    firewalld_check.rc != 0
+  tags: ['firewall']
