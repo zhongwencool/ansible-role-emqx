@@ -90,6 +90,7 @@
     owner: emqx
     group: emqx
     mode: '0644'
+  register: emqx_config
 
 - name: Configure firewall for EMQX cluster
   ansible.builtin.include_tasks: firewall.yml
@@ -128,22 +129,13 @@
   when: container_info is defined
   changed_when: false
 
-- name: Ensure EMQX service has the correct Restart policy
-  ansible.builtin.lineinfile:
-    path: /lib/systemd/system/emqx.service
-    regexp: '^Restart='
-    line: 'Restart={{ emqx_service_restart }}'
-    backup: yes
-
-- name: Ensure systemd is up-to-date with the latest unit files
-  ansible.builtin.systemd:
-    daemon_reload: yes
-
 - name: Ensure EMQX service's restart ok
   ansible.builtin.service:
     name: emqx
     state: restarted
     enabled: "{{ emqx_service_enabled }}"
+  when: emqx_config.changed | default(false)
+  register: emqx_restart
 
 - name: Wait for EMQX tcp port to be ready
   ansible.builtin.wait_for:
@@ -175,3 +167,4 @@
     name: emqx
     state: "{{ emqx_service_state }}"
     enabled: "{{ emqx_service_enabled }}"
+  when: not emqx_restart.changed
