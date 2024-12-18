@@ -1,0 +1,72 @@
+---
+- name: Ensure EMQX directories have correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: emqx
+    group: emqx
+    recurse: yes
+  with_items:
+    - /etc/emqx
+    - /var/lib/emqx
+    - /var/log/emqx
+
+- name: Configure EMQX service restart settings
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/emqx.service
+    regexp: "^Restart="
+    line: "Restart={{ emqx_service_restart }}"
+    state: present
+  register: restart_config
+
+- name: Configure EMQX service restart delay
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/emqx.service
+    regexp: "^RestartSec="
+    line: "RestartSec={{ emqx_service_restart_sec }}"
+    state: present
+  register: restart_delay_config
+
+- name: Reload systemd daemon if service config changed
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: restart_config.changed or restart_delay_config.changed
+
+- name: Create EMQX configuration
+  ansible.builtin.template:
+    src: emqx.conf.j2
+    dest: /etc/emqx/emqx.conf
+    owner: emqx
+    group: emqx
+    mode: '0644'
+  notify: Restart EMQX
+
+- name: Ensure EMQX service's state
+  ansible.builtin.service:
+    name: emqx
+    state: "{{ emqx_service_state }}"
+    enabled: "{{ emqx_service_enabled }}"
+
+- name: Wait for EMQX tcp port to be ready
+  ansible.builtin.wait_for:
+    port: "{{ emqx_tcp_port }}"
+    timeout: 3000
+  when: emqx_tcp_port != 0
+
+- name: Wait for cluster formation
+  ansible.builtin.command: emqx ctl cluster status --json
+  register: cluster_status
+  until: >
+    (cluster_status.stdout | from_json).running_nodes | length ==
+    (emqx_cluster_seeds | length)
+  retries: 10
+  delay: 5
+  changed_when: false
+
+- name: Print cluster status on retry failure
+  ansible.builtin.debug:
+    msg: "Cluster formation failed after retries. Current status: {{ cluster_status.stdout }}"
+  when: cluster_status is failed
+
+- name: Display cluster status
+  ansible.builtin.debug:
+    var: cluster_status.stdout_lines

@@ -10,11 +10,6 @@
     emqx_service_state: started
     emqx_service_enabled: true
 
-    # Basic settings
-    emqx_user: emqx
-    emqx_group: emqx
-    emqx_user_home: /var/lib/emqx
-
     # Cluster configuration
     emqx_cluster_name: emqx_cluster
     emqx_discovery_strategy: static

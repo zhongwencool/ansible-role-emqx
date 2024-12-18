@@ -76,8 +76,8 @@
     src: "/tmp/emqx-{{ emqx_version }}/emqx_guard_pro-{{ guard_pro_version }}.tar.gz"
     dest: "/usr/lib/emqx/plugins/emqx_guard_pro-{{ guard_pro_version }}.tar.gz"
     remote_src: true
-    owner: "{{ emqx_user }}"
-    group: "{{ emqx_group }}"
+    owner: emqx
+    group: emqx
     mode: '0644'
   when: guard_pro_download.changed
   tags: ['plugins']
@@ -91,8 +91,8 @@
   ansible.builtin.template:
     src: emqx_guard_pro.conf.j2
     dest: /usr/lib/emqx/plugins/emqx_guard_pro-{{ guard_pro_version }}/emqx_guard_pro-{{ guard_pro_version }}/priv/config.hocon
-    owner: "{{ emqx_user }}"
-    group: "{{ emqx_group }}"
+    owner: emqx
+    group: emqx
     mode: '0644'
   tags: ['plugins']
 

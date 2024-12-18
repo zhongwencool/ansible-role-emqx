@@ -44,4 +44,4 @@
 - name: Install EMQX from deb package
   ansible.builtin.apt:
     deb: "{{ pkg_path }}"
-    state: "{{ emqx_package_state }}"
+    state: present

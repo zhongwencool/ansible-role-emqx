@@ -9,166 +9,30 @@
       paths:
         - "vars"
 
-- name: Ensure EMQX group exists
-  ansible.builtin.group:
-    name: "{{ emqx_group }}"
-    state: present
-    system: yes
+- name: Include initial setup tasks
+  ansible.builtin.include_tasks: setup-0-initial.yml
+  tags: [initial]
 
-- name: Register hostname when initialising
-  ansible.builtin.set_fact:
-    emqx_hostname: >-
-      {%- if hostvars[inventory_hostname].emqx_hostname is defined -%}
-      {{- hostvars[inventory_hostname].emqx_hostname -}}
-      {%- else -%}
-        {%- if inventory_hostname is match("emqx\\d+.*") -%}
-        {%- set lookup_key = inventory_hostname | regex_replace('^(emqx\\d+).*$', '\\1') + '-test' -%}
-        {%- set host_vars = hostvars[inventory_hostname]['molecule_yml']['provisioner']['inventory']['host_vars'] -%}
-        {{- host_vars[lookup_key]['emqx_hostname'] -}}
-        {%- else -%}
-        {{- emqx_hostname | default(inventory_hostname) -}}
-        {%- endif -%}
-      {%- endif -%}
+- name: Include sysctl tasks
+  ansible.builtin.include_tasks: setup-1-sysctl.yml
+  tags: [sysctl]
 
-- name: Set cluster seeds from all nodes
-  ansible.builtin.set_fact:
-    emqx_cluster_seeds: >-
-      [{%- for host in groups['all'] -%}'emqx@{{ hostvars[host].emqx_hostname }}'{%- if not loop.last -%},{%- endif -%}{%- endfor -%}]
-
-- name: Ensure EMQX user exists
-  ansible.builtin.user:
-    name: "{{ emqx_user }}"
-    group: "{{ emqx_group }}"
-    home: "{{ emqx_user_home }}"
-    shell: "{{ emqx_user_shell }}"
-    system: yes
-    state: present
-
-- name: Include OS-specific tasks
-  ansible.builtin.include_tasks: "setup-{{ ansible_os_family }}.yml"
-
-- name: Ensure EMQX directories have correct ownership
-  ansible.builtin.file:
-    path: "{{ item }}"
-    owner: "{{ emqx_user }}"
-    group: "{{ emqx_group }}"
-    recurse: yes
-  with_items:
-    - /etc/emqx
-    - /var/lib/emqx
-    - /var/log/emqx
-
-- name: Validate sysctl settings
-  block:
-    - name: Check valid sysctl settings
-      ansible.builtin.shell:
-        cmd: "sysctl -n {{ item.key }} || true"
-      register: sysctl_check
-      loop: "{{ emqx_sysctl_settings | dict2items }}"
-      changed_when: false
-      failed_when: false
-
-    - name: Filter valid sysctl settings
-      ansible.builtin.set_fact:
-        valid_sysctl_settings: "{{ emqx_sysctl_settings | dict2items | selectattr('key', 'in', sysctl_check.results | selectattr('stdout', 'ne', '') | map(attribute='item') | map(attribute='key') | list) }}"
-
-    - name: Configure system settings
-      ansible.posix.sysctl:
-        name: "{{ item.key }}"
-        value: "{{ item.value }}"
-        state: present
-        sysctl_set: yes
-        reload: yes
-      loop: "{{ valid_sysctl_settings }}"
-      loop_control:
-        label: "{{ item.key }}"
-
-- name: Create EMQX configuration
-  ansible.builtin.template:
-    src: emqx.conf.j2
-    dest: /etc/emqx/emqx.conf
-    owner: emqx
-    group: emqx
-    mode: '0644'
-  register: emqx_config
-
-- name: Configure firewall for EMQX cluster
-  ansible.builtin.include_tasks: firewall.yml
+- name: Configure firewall for EMQX(4370|5730)
+  ansible.builtin.include_tasks: setup-2-firewall.yml
   tags: [firewall]
 
-- name: Get container info
-  ansible.builtin.set_fact:
-    container_info: |
-      {% set result = [] %}
-      {% for host in groups['all'] %}
-      {%   if hostvars[host].ansible_default_ipv4 is defined %}
-      {%     set host_info = {'ip': hostvars[host].ansible_default_ipv4.address} %}
-      {%     if hostvars[host].emqx_hostname is defined %}
-      {%       set _ = host_info.update({'hostname': hostvars[host].emqx_hostname}) %}
-      {%     else %}
-      {%       set _ = host_info.update({'hostname': host}) %}
-      {%     endif %}
-      {%     set _ = result.append(host_info) %}
-      {%   endif %}
-      {% endfor %}
-      {{ result }}
-  run_once: true
+- name: Include chrony tasks
+  ansible.builtin.include_tasks: setup-3-chrony.yml
+  tags: [chrony]
 
-- name: Debug container info
-  ansible.builtin.debug:
-    var: container_info | from_yaml
-  run_once: true
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "setup-4-{{ ansible_os_family | lower }}.yml"
 
-- name: Update /etc/hosts with all cluster nodes
-  ansible.builtin.shell: |
-    {% set hosts = container_info | from_yaml %}
-    {% for host in hosts %}
-    grep -q "^{{ host.ip }}\s\+{{ host.hostname }}$" /etc/hosts || \
-    echo "{{ host.ip }} {{ host.hostname }}" >> /etc/hosts
-    {% endfor %}
-  when: container_info is defined
-  changed_when: false
+- name: Include EMQX-Setup tasks
+  ansible.builtin.include_tasks: setup-5-emqx.yml
+  tags: [emqx]
 
-- name: Ensure EMQX service's restart ok # noqa: no-handler
-  ansible.builtin.service:
-    name: emqx
-    state: restarted
-    enabled: "{{ emqx_service_enabled }}"
-  when: emqx_config.changed | default(false)
-  register: emqx_restart
-
-- name: Wait for EMQX tcp port to be ready
-  ansible.builtin.wait_for:
-    port: "{{ emqx_tcp_port }}"
-    timeout: 3000
-  when: emqx_tcp_port != 0
-
-- name: Wait for cluster formation
-  ansible.builtin.command: emqx ctl cluster status --json
-  register: cluster_status
-  until: >
-    (cluster_status.stdout | from_json).running_nodes | length ==
-    (emqx_cluster_seeds | length)
-  retries: 10
-  delay: 5
-  changed_when: false
-
-- name: Insatall Guard-pro plugin
-  ansible.builtin.include_tasks: plugins.yml
+- name: Include Guard-Pro plugin
+  ansible.builtin.include_tasks: setup-6-plugin.yml
+  when: emqx_guard_pro_enabled | bool
   tags: [plugins]
-
-- name: Print cluster status on retry failure
-  ansible.builtin.debug:
-    msg: "Cluster formation failed after retries. Current status: {{ cluster_status.stdout }}"
-  when: cluster_status is failed
-
-- name: Display cluster status
-  ansible.builtin.debug:
-    var: cluster_status.stdout_lines
-
-- name: Ensure EMQX service's state
-  ansible.builtin.service:
-    name: emqx
-    state: "{{ emqx_service_state }}"
-    enabled: "{{ emqx_service_enabled }}"
-  when: not emqx_restart.changed

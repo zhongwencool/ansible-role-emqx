@@ -1,0 +1,26 @@
+---
+
+- name: Set locale
+  ansible.builtin.copy:
+    content: |
+      LANG={{ effective_locale }}
+      LANGUAGE={{ emqx_language }}
+      LC_ALL={{ effective_locale }}
+    dest: "/etc/default/locale"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Generate locale
+  ansible.builtin.command: locale-gen {{ emqx_locale }}
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "{{ emqx_hostname }}"
+  become: true
+  when: ansible_service_mgr == 'systemd' and ansible_virtualization_type != 'docker'
+
+- name: Setup EMQX package
+  ansible.builtin.include_tasks: packages/debian.yml

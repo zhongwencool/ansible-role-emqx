@@ -1,8 +1,15 @@
 ---
-- name: Set OS-specific variables
-  ansible.builtin.set_fact:
-    locale_file_path: /etc/locale.conf
-    chrony_conf_path: /etc/chrony.conf
+
+- name: Set locale
+  ansible.builtin.copy:
+    content: |
+      LANG={{ effective_locale }}
+      LANGUAGE={{ emqx_language }}
+      LC_ALL={{ effective_locale }}
+    dest: "/etc/locale.conf"
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Remove curl-minimal package if present
   ansible.builtin.dnf:
@@ -44,9 +51,6 @@
     name: "{{ emqx_hostname }}"
   become: true
   when: ansible_service_mgr == 'systemd' and ansible_virtualization_type != 'docker'
-
-- name: Include common tasks
-  ansible.builtin.include_tasks: common.yml
 
 - name: Setup EMQX package
   ansible.builtin.include_tasks: packages/redhat.yml

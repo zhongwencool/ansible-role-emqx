@@ -14,7 +14,7 @@
 - name: Set package path and URLs
   ansible.builtin.set_fact:
     pkg_path: >-
-      /tmp/emqx-/emqx-{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.rpm
+      /tmp/emqx-{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.rpm
     pkg_url: >-
       https://www.emqx.com/en/downloads/broker/{{ emqx_version }}/{{ pkg_name }}-{{ pkg_arch }}.rpm
     pkg_checksum_url: >-
@@ -44,5 +44,5 @@
 - name: Install EMQX from rpm package with dnf
   ansible.builtin.dnf:
     name: "{{ pkg_path }}"
-    state: "{{ emqx_package_state }}"
+    state: present
     disable_gpg_check: true

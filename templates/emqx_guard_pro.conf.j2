@@ -3,48 +3,48 @@ license = "{{ emqx_guard_pro_license }}"
 # SMTP settings
 # https://guard.emqx.dev/guide/configuration/smtp.html
 smtp {
-    enable = {{ emqx_guard_pro_smtp_enable }},
-    host = "{{ emqx_guard_pro_smtp_host }}",
-    user = "{{ emqx_guard_pro_smtp_user }}",
-    password = "{{ emqx_guard_pro_smtp_password }}",
-    from_address = "{{ emqx_guard_pro_smtp_from_address }}",
-    to_address = "{{ emqx_guard_pro_smtp_to_address }}",
+    enable = {{ emqx_guard_pro_smtp.enable | lower }},
+    host = "{{ emqx_guard_pro_smtp.host }}",
+    user = "{{ emqx_guard_pro_smtp.user }}",
+    password = "{{ emqx_guard_pro_smtp.password }}",
+    from_address = "{{ emqx_guard_pro_smtp.from_address }}",
+    to_address = "{{ emqx_guard_pro_smtp.to_address }}",
     auth = if_available,
-    skip_verify = {{ emqx_guard_pro_smtp_skip_verify }}
+    skip_verify = {{ emqx_guard_pro_smtp.skip_verify | lower }}
 }
 
 # Slack settings
 # https://guard.emqx.dev/guide/configuration/slack.html
 slack {
-    enable = {{ emqx_guard_pro_slack_enable }},
-    webhook = "{{ emqx_guard_pro_slack_webhook }}",
-    channel = "{{ emqx_guard_pro_slack_channel }}",
-    token = "{{ emqx_guard_pro_slack_token }}"
+    enable = {{ emqx_guard_pro_slack.enable | lower }},
+    webhook = "{{ emqx_guard_pro_slack.webhook }}",
+    channel = "{{ emqx_guard_pro_slack.channel }}",
+    token = "{{ emqx_guard_pro_slack.token }}"
 }
 
 # Dingtalk settings
 # https://guard.emqx.dev/guide/configuration/dingtalk.html
 dingtalk {
-    enable = {{ emqx_guard_pro_dingtalk_enable }},
-    webhook = "{{ emqx_guard_pro_dingtalk_webhook }}",
-    secret = "{{ emqx_guard_pro_dingtalk_secret }}",
-    at_mobiles = "{{ emqx_guard_pro_dingtalk_at_mobiles }}"
+    enable = {{ emqx_guard_pro_dingtalk.enable | lower }},
+    webhook = "{{ emqx_guard_pro_dingtalk.webhook }}",
+    secret = "{{ emqx_guard_pro_dingtalk.secret }}",
+    at_mobiles = "{{ emqx_guard_pro_dingtalk.at_mobiles }}"
 }
 
 # Wechat settings
 # https://guard.emqx.dev/guide/configuration/wechat.html
 wechat {
-    enable = {{ emqx_guard_pro_wechat_enable }},
-    webhook = "{{ emqx_guard_pro_wechat_webhook }}",
-    at_mobiles = "{{ emqx_guard_pro_wechat_at_mobiles }}"
+    enable = {{ emqx_guard_pro_wechat.enable | lower }},
+    webhook = "{{ emqx_guard_pro_wechat.webhook }}",
+    at_mobiles = "{{ emqx_guard_pro_wechat.at_mobiles }}"
 }
 
 # Feishu settings
 # https://guard.emqx.dev/guide/configuration/feishu.html
 feishu {
-    enable = {{ emqx_guard_pro_feishu_enable }},
-    webhook = "{{ emqx_guard_pro_feishu_webhook }}",
-    secret = "{{ emqx_guard_pro_feishu_secret }}",
-    template_version_name = "{{ emqx_guard_pro_feishu_template_version_name }}",
-    template_id = "{{ emqx_guard_pro_feishu_template_id }}"
+    enable = {{ emqx_guard_pro_feishu.enable | lower }},
+    webhook = "{{ emqx_guard_pro_feishu.webhook }}",
+    secret = "{{ emqx_guard_pro_feishu.secret }}",
+    template_version_name = "{{ emqx_guard_pro_feishu.template_version_name }}",
+    template_id = "{{ emqx_guard_pro_feishu.template_id }}"
 }

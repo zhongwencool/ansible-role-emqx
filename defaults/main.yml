@@ -6,11 +6,95 @@ emqx_version: "5.8.3"
 emqx_hostname: "{{ inventory_hostname }}"
 
 # Installation options
-emqx_package_state: present
+# reloaded ｜ restarted ｜ started ｜ stopped
 emqx_service_state: started
 emqx_service_enabled: true
-## always, on-failure, no
+## always ｜ on-failure ｜ no
 emqx_service_restart: always
+emqx_service_restart_sec: 60s
+
+# EMQX Configuration
+emqx_cookie: "emqxsecretcookie"
+emqx_tcp_port: 1883
+emqx_ssl_port: 8883
+emqx_ws_port: 8083
+emqx_wss_port: 8084
+emqx_dashboard_port: 18083
+
+# SSL/TLS Configuration
+emqx_ssl_enabled: false
+emqx_ssl_certfile: ""
+emqx_ssl_keyfile: ""
+
+# Locale settings
+emqx_locale: "en_US.UTF-8"
+emqx_language: "en_US:en"
+
+# EMQX cluster settings
+emqx_cluster_name: emqx_cluster
+## static | etcd | manual
+emqx_discovery_strategy: static
+
+# etcd discovery settings
+emqx_etcd_servers:
+  - http://etcd-server-1:2379
+  - http://etcd-server-2:2379
+  - http://etcd-server-3:2379
+emqx_etcd_prefix: emqxctl
+emqx_etcd_node_ttl: 90s
+
+emqx_guard_pro_enabled: true
+emqx_guard_pro_license: "default"
+
+# SMTP settings
+# https://guard.emqx.dev/guide/configuration/gmail.html
+# https://guard.emqx.dev/guide/configuration/qqmail.html
+emqx_guard_pro_smtp:
+  enable: false
+  host: ""
+  user: ""
+  password: ""
+  from_address: ""
+  to_address: ""
+  skip_verify: true
+
+# Slack settings
+# https://guard.emqx.dev/guide/configuration/slack.html
+emqx_guard_pro_slack:
+  enable: false
+  webhook: ""
+  channel: ""
+  token: ""
+
+# Dingtalk settings
+# https://guard.emqx.dev/guide/configuration/dingtalk.html
+emqx_guard_pro_dingtalk:
+  enable: false
+  webhook: ""
+  secret: ""
+  at_mobiles: ""
+
+# Wechat settings
+# https://guard.emqx.dev/guide/configuration/wechat.html
+emqx_guard_pro_wechat:
+  enable: false
+  webhook: ""
+  secret: ""
+  at_mobiles: ""
+
+# Feishu settings
+# https://guard.emqx.dev/guide/configuration/feishu.html
+emqx_guard_pro_feishu:
+  enable: false
+  webhook: ""
+  secret: ""
+  template_version_name: ""
+  template_id: ""
+
+# EMQX cluster ports
+emqx_cluster_rpc_ports:
+  - 4370  # EMQX distributed Erlang port mapping
+  - 5370  # EMQX distributed node discovery
 
 # System tuning
 emqx_sysctl_settings:
@@ -41,87 +125,3 @@ emqx_sysctl_settings:
   # Minimum, default, and maximum sizes for TCP send buffers
   net.ipv4.tcp_wmem: '1024 4096 16777216'
   vm.swappiness: 0
-
-# EMQX Configuration
-emqx_cookie: "emqxsecretcookie"
-emqx_tcp_port: 1883
-emqx_ssl_port: 8883
-emqx_ws_port: 8083
-emqx_wss_port: 8084
-emqx_dashboard_port: 18083
-
-# SSL/TLS Configuration
-emqx_ssl_enabled: false
-emqx_ssl_certfile: ""
-emqx_ssl_keyfile: ""
-
-# User and group settings
-emqx_user: emqx
-emqx_group: emqx
-emqx_user_home: /home/emqx
-emqx_user_shell: /bin/bash
-
-# Locale settings
-emqx_locale: "en_US.UTF-8"
-emqx_language: "en_US:en"
-
-# EMQX cluster ports
-emqx_cluster_rpc_ports:
-  - 4370  # EMQX distributed Erlang port mapping
-  - 5370  # EMQX distributed node discovery
-
-# EMQX cluster settings
-emqx_cluster_name: emqx_cluster
-## static | etcd | manual
-emqx_discovery_strategy: static
-
-# etcd discovery settings
-emqx_etcd_servers:
-  - http://etcd-server-1:2379
-  - http://etcd-server-2:2379
-  - http://etcd-server-3:2379
-emqx_etcd_prefix: emqxctl
-emqx_etcd_node_ttl: 90s
-
-emqx_guard_pro_enabled: false
-emqx_guard_pro_license: "default"
-
-# SMTP settings
-# https://guard.emqx.dev/guide/configuration/gmail.html
-# https://guard.emqx.dev/guide/configuration/qqmail.html
-emqx_guard_pro_smtp_enable: false
-emqx_guard_pro_smtp_host: ""
-emqx_guard_pro_smtp_user: ""
-emqx_guard_pro_smtp_password: ""
-emqx_guard_pro_smtp_from_address: ""
-emqx_guard_pro_smtp_to_address: ""
-emqx_guard_pro_smtp_skip_verify: true
-
-# Slack settings
-# https://guard.emqx.dev/guide/configuration/slack.html
-emqx_guard_pro_slack_enable: false
-emqx_guard_pro_slack_webhook: ""
-emqx_guard_pro_slack_channel: ""
-emqx_guard_pro_slack_token: ""
-
-# Dingtalk settings
-# https://guard.emqx.dev/guide/configuration/dingtalk.html
-emqx_guard_pro_dingtalk_enable: false
-emqx_guard_pro_dingtalk_webhook: ""
-emqx_guard_pro_dingtalk_secret: ""
-emqx_guard_pro_dingtalk_at_mobiles: ""
-
-# Wechat settings
-# https://guard.emqx.dev/guide/configuration/wechat.html
-emqx_guard_pro_wechat_enable: false
-emqx_guard_pro_wechat_webhook: ""
-emqx_guard_pro_wechat_secret: ""
-emqx_guard_pro_wechat_at_mobiles: ""
-
-# Feishu settings
-# https://guard.emqx.dev/guide/configuration/feishu.html
-emqx_guard_pro_feishu_enable: false
-emqx_guard_pro_feishu_webhook: ""
-emqx_guard_pro_feishu_secret: ""
-emqx_guard_pro_feishu_template_version_name: ""
-emqx_guard_pro_feishu_template_id: ""

@@ -3,6 +3,7 @@
   ansible.builtin.service:
     name: emqx
     state: restarted
+    enabled: "{{ emqx_service_enabled }}"
 
 - name: Restart Chronyd
   ansible.builtin.service:
