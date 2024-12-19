@@ -1,0 +1,26 @@
+---
+# The desired state of the EMQX service
+# Values:
+#   reloaded - Reload the service configuration
+#   restarted - Restart the service
+#   started - Start the service (default)
+#   stopped - Stop the service
+emqx_service_state: started
+
+# Whether to enable the EMQX service to start on boot
+# Values:
+#   true - Enable service autostart (default)
+#   false - Disable service autostart
+emqx_service_enabled: true
+
+# Set the restart policy for systemd systems
+# Values = no | on-failure | on-abnormal | on-abort | always
+# [Service]
+# Restart=always
+emqx_service_restart: always
+
+# Set the restart timer in seconds
+# [Service]
+# RestartSec=60s
+# Default is to comment this out
+emqx_service_restart_sec: 60s

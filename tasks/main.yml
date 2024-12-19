@@ -15,6 +15,7 @@
 
 - name: Include sysctl tasks
   ansible.builtin.include_tasks: setup-1-sysctl.yml
+  when: emqx_sysctl_enabled | default(true) | bool
   tags: [sysctl]
 
 - name: Configure firewall for EMQX(4370|5730)
@@ -23,6 +24,7 @@
 
 - name: Include chrony tasks
   ansible.builtin.include_tasks: setup-3-chrony.yml
+  when: emqx_chrony_enabled | default(true) | bool
   tags: [chrony]
 
 - name: Include OS-specific tasks
@@ -34,5 +36,5 @@
 
 - name: Include Guard-Pro plugin
   ansible.builtin.include_tasks: setup-6-plugin.yml
-  when: emqx_guard_pro_enabled | bool
+  when: emqx_guard_pro_enabled | default(true) | bool
   tags: [plugins]

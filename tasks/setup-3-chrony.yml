@@ -2,7 +2,7 @@
 - name: Configure chrony
   ansible.builtin.template:
     src: chrony.conf.j2
-    dest: "{%- if ansible_os_family == 'Debian' -%}/etc/chrony/chrony.conf{%- else -%}/etc/chrony.conf{%- endif -%}"
+    dest: "{{ chrony_conf_path }}"
     mode: '0644'
   notify: Restart Chronyd
 

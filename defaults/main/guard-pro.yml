@@ -1,0 +1,54 @@
+---
+# Whether to enable Guard Pro
+# Values:
+#   true - Enable Guard Pro
+#   false - Skip Guard Pro
+emqx_guard_pro_enabled: true
+
+# License key for Guard Pro
+emqx_guard_pro_license: "default"
+
+# SMTP settings
+# https://guard.emqx.dev/guide/configuration/gmail.html
+# https://guard.emqx.dev/guide/configuration/qqmail.html
+emqx_guard_pro_smtp:
+  enable: false
+  host: ""
+  user: ""
+  password: ""
+  from_address: ""
+  to_address: ""
+  skip_verify: true
+
+# Slack settings
+# https://guard.emqx.dev/guide/configuration/slack.html
+emqx_guard_pro_slack:
+  enable: false
+  webhook: ""
+  channel: ""
+  token: ""
+
+# Dingtalk settings
+# https://guard.emqx.dev/guide/configuration/dingtalk.html
+emqx_guard_pro_dingtalk:
+  enable: false
+  webhook: ""
+  secret: ""
+  at_mobiles: ""
+
+# Wechat settings
+# https://guard.emqx.dev/guide/configuration/wechat.html
+emqx_guard_pro_wechat:
+  enable: false
+  webhook: ""
+  secret: ""
+  at_mobiles: ""
+
+# Feishu settings
+# https://guard.emqx.dev/guide/configuration/feishu.html
+emqx_guard_pro_feishu:
+  enable: false
+  webhook: ""
+  secret: ""
+  template_version_name: ""
+  template_id: ""

@@ -1,3 +1,2 @@
 ---
-emqx_repo_url: "https://www.emqx.com/en/downloads/broker/v{{ emqx_version }}/debian"
-emqx_gpg_key: "https://packagecloud.io/emqx/emqx/gpgkey"
+chrony_conf_path: /etc/chrony/chrony.conf

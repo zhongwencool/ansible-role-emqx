@@ -68,7 +68,7 @@
   when: container_info is defined
   changed_when: false
 
-- name: Install required dependencies
+- name: Install required dependencies for Debian
   ansible.builtin.apt:
     name:
       - apt-transport-https
@@ -76,7 +76,6 @@
       - libssl-dev
       - libncurses5-dev
       - curl
-      - gnupg
       - locales
       - ufw
       - chrony
@@ -85,11 +84,36 @@
     cache_valid_time: 3600
   register: apt_install_deps_result
   become: true
+  when: ansible_os_family == 'Debian'
 
 - name: Display package installation results
   ansible.builtin.debug:
     var: apt_install_deps_result
     verbosity: 1
+  when: ansible_os_family == 'Debian'
+
+- name: Install required dependencies for RedHat
+  ansible.builtin.dnf:
+    name:
+      - openssl-devel
+      - ncurses-devel
+      - curl
+      - wget
+      - tar
+      - gzip
+      - firewalld
+      - chrony
+    state: present
+    update_cache: true
+  register: dnf_install_deps_result
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Display package installation results
+  ansible.builtin.debug:
+    var: dnf_install_deps_result
+    verbosity: 1
+  when: ansible_os_family == 'RedHat'
 
 - name: Set hostname in /etc/hostname
   ansible.builtin.shell: |

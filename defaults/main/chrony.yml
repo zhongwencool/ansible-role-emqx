@@ -1,0 +1,16 @@
+---
+# Whether to enable chrony time synchronization
+# Values:
+#   true - Enable chrony time synchronization
+#   false - Skip chrony time synchronization
+# https://chrony-project.org/
+emqx_chrony_enabled: true
+
+# NTP servers
+emqx_chrony_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - ntp.aliyun.com
+  - cn.pool.ntp.org
+  - time.google.com
+  - ntp.ntsc.ac.cn

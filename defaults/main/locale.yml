@@ -1,0 +1,4 @@
+---
+# Locale settings
+emqx_locale: "en_US.UTF-8"
+emqx_language: "en_US:en"

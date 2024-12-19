@@ -1,0 +1,41 @@
+---
+# EMQX version
+emqx_version: "5.8.3"
+
+# Hostname settings
+emqx_hostname: "{{ inventory_hostname }}"
+
+# EMQX Configuration
+emqx_cookie: "emqxsecretcookie"
+emqx_tcp_port: 1883
+emqx_ssl_port: 8883
+emqx_ws_port: 8083
+emqx_wss_port: 8084
+emqx_dashboard_port: 18083
+
+# SSL/TLS Configuration
+emqx_ssl_enabled: false
+emqx_ssl_certfile: ""
+emqx_ssl_keyfile: ""
+
+# EMQX cluster settings
+emqx_cluster_name: emqx_cluster
+## static | etcd | manual
+emqx_discovery_strategy: static
+
+# etcd discovery settings
+emqx_etcd_servers:
+  - http://etcd-server-1:2379
+  - http://etcd-server-2:2379
+  - http://etcd-server-3:2379
+emqx_etcd_prefix: emqxctl
+emqx_etcd_node_ttl: 90s
+
+# EMQX cluster ports
+# These ports are used for inter-node communication in the EMQX cluster
+# List of required ports:
+#   - 4370: Used for EMQX distributed Erlang port mapping and inter-node RPC calls
+#   - 5370: Used for EMQX distributed node discovery and cluster formation
+emqx_cluster_rpc_ports:
+  - 4370
+  - 5370

@@ -1,0 +1,37 @@
+---
+# Whether to enable sysctl tuning for EMQX
+# Values:
+#   true - Enable sysctl tuning
+#   false - Skip sysctl tuning
+emqx_sysctl_enabled: true
+
+# System tuning
+# https://docs.emqx.com/en/emqx/latest/performance/tune.html
+emqx_sysctl_settings:
+  # Maximum number of file handles the system can allocate
+  fs.file-max: 2097152
+  # Maximum number of queued connections on a socket
+  net.core.somaxconn: 32768
+  # Maximum number of remembered connection requests that have not received an acknowledgment from client
+  net.ipv4.tcp_max_syn_backlog: 16384
+  # Range of ports that can be used by TCP/UDP when choosing a local port
+  net.ipv4.ip_local_port_range: "1024 65535"
+  # Time (in seconds) that must elapse before TCP/IP can release a closed connection
+  net.ipv4.tcp_fin_timeout: 15
+  # Allow reuse of TIME-WAIT sockets for new connections
+  net.ipv4.tcp_tw_reuse: 1
+  # Default size of receive buffer used by sockets
+  net.core.rmem_default: 262144
+  # Default size of send buffer used by sockets
+  net.core.wmem_default: 262144
+  # Maximum size of receive buffer allowed for sockets
+  net.core.rmem_max: 16777216
+  # Maximum size of send buffer allowed for sockets
+  net.core.wmem_max: 16777216
+  # Maximum amount of option memory buffers
+  net.core.optmem_max: 16777216
+  # Minimum, default, and maximum sizes for TCP receive buffers
+  net.ipv4.tcp_rmem: '1024 4096 16777216'
+  # Minimum, default, and maximum sizes for TCP send buffers
+  net.ipv4.tcp_wmem: '1024 4096 16777216'
+  vm.swappiness: 0

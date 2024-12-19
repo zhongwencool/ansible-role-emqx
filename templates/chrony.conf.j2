@@ -1,10 +1,7 @@
 # Use public NTP servers from the pool.ntp.org project
-server 0.pool.ntp.org iburst
-server 1.pool.ntp.org iburst
-server ntp.aliyun.com iburst
-server cn.pool.ntp.org iburst
-server time.google.com iburst
-server ntp.ntsc.ac.cn iburst
+{% for server in emqx_chrony_servers %}
+server {{ server }} iburst
+{% endfor %}
 
 # Record the rate at which the system clock gains/losses time
 driftfile /var/lib/chrony/drift
