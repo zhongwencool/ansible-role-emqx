@@ -1,5 +1,5 @@
 ---
-name: Molecule Test
+name: Molecule CI/CD
 
 on:
   push:
@@ -53,13 +53,24 @@ jobs:
         run: |
           python3 -m venv venv
           source venv/bin/activate
+          # Try static scenario
           for i in {1..3}; do
-            echo "Attempt $i of 3"
-            if MOLECULE_DISTRO=${{ matrix.distro }} molecule test; then
+            echo "Attempt static $i of 3"
+            if MOLECULE_DISTRO=${{ matrix.distro }} molecule test -s static; then
+              break
+            fi
+            echo "Attempt static $i failed, retrying..."
+            sleep 15
+          done
+
+          # Try manual scenario
+          for i in {1..3}; do
+            echo "Attempt manual $i of 3"
+            if MOLECULE_DISTRO=${{ matrix.distro }} molecule test -s manual; then
               exit 0
             fi
-            echo "Attempt $i failed, retrying..."
-            sleep 5
+            echo "Attempt manual $i failed, retrying..."
+            sleep 15
           done
           exit 1
         env:

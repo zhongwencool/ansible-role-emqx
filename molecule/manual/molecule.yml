@@ -59,19 +59,20 @@ provisioner:
   inventory:
     group_vars:
       all:
-        emqx_cookie: "molecule_test_cookie"
+        emqx_cookie: "molecule_manual_cookie"
         ansible_user: root
         emqx_tcp_port: 1883
         emqx_ssl_port: 8883
         emqx_ws_port: 8083
         emqx_wss_port: 8084
         emqx_dashboard_port: 18083
-        emqx_discovery_strategy: static
+        emqx_discovery_strategy: manual
+        emqx_initial_hostname: "manual1.molecule"
     host_vars:
       "emqx1-test":
-        emqx_hostname: "s1.molecule"
+        emqx_hostname: "manual1.molecule"
       "emqx2-test":
-        emqx_hostname: "s2.molecule"
+        emqx_hostname: "manual2.molecule"
   playbooks:
     converge: converge.yml
 
@@ -79,7 +80,7 @@ verifier:
   name: ansible
 
 scenario:
-  name: default
+  name: manual
   test_sequence:
     - dependency
     - cleanup

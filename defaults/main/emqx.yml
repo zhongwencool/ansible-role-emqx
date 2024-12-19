@@ -7,28 +7,40 @@ emqx_hostname: "{{ inventory_hostname }}"
 
 # EMQX Configuration
 emqx_cookie: "emqxsecretcookie"
-emqx_tcp_port: 1883
-emqx_ssl_port: 8883
-emqx_ws_port: 8083
-emqx_wss_port: 8084
-emqx_dashboard_port: 18083
-
-# SSL/TLS Configuration
-emqx_ssl_enabled: false
-emqx_ssl_certfile: ""
-emqx_ssl_keyfile: ""
 
 # EMQX cluster settings
 emqx_cluster_name: emqx_cluster
-## static | etcd | manual
+
+# Static discovery settings
+# When using static discovery, Ansible will automatically collect all deployed nodes in the cluster
+# No need to manually configure static_nodes list
+# This is the simplest discovery method and works well for fixed cluster configurations
 emqx_discovery_strategy: static
 
+# Manual discovery settings
+# When using manual discovery, Ansible will automatically make all other nodes join the emqx_initial_host node
+# This is useful when you want to explicitly control which node other nodes should join
+# emqx_discovery_strategy: manual
+# emqx_initial_hostname: s1.emqx.dev  # The hostname that other nodes will join
+
 # etcd discovery settings
+# When using etcd discovery, EMQX nodes will register themselves in etcd and discover other nodes
+# This is useful for dynamic cluster configurations where nodes may come and go
+# emqx_discovery_strategy: etcd
+
+# List of etcd servers to connect to
 emqx_etcd_servers:
   - http://etcd-server-1:2379
   - http://etcd-server-2:2379
   - http://etcd-server-3:2379
+
+# Prefix used for EMQX keys stored in etcd
+# All EMQX cluster data will be stored under this prefix
 emqx_etcd_prefix: emqxctl
+
+# Time-to-live for node registration in etcd
+# Nodes must refresh their registration within this time period
+# or they will be considered offline
 emqx_etcd_node_ttl: 90s
 
 # EMQX cluster ports
@@ -39,3 +51,14 @@ emqx_etcd_node_ttl: 90s
 emqx_cluster_rpc_ports:
   - 4370
   - 5370
+
+emqx_tcp_port: 1883
+emqx_ssl_port: 8883
+emqx_ws_port: 8083
+emqx_wss_port: 8084
+emqx_dashboard_port: 18083
+
+# SSL/TLS Configuration
+emqx_ssl_enabled: false
+emqx_ssl_certfile: ""
+emqx_ssl_keyfile: ""

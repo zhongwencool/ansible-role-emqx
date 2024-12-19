@@ -52,15 +52,26 @@
     timeout: 3000
   when: emqx_tcp_port != 0
 
+- name: Join EMQX cluster manually when discovery strategy is manual
+  ansible.builtin.command: "emqx ctl cluster join emqx@{{ emqx_initial_hostname }}"
+  when:
+    - emqx_discovery_strategy == "manual"
+    - emqx_initial_hostname is defined
+  changed_when: false
+
+
 - name: Wait for cluster formation
   ansible.builtin.command: emqx ctl cluster status --json
   register: cluster_status
   until: >
     (cluster_status.stdout | from_json).running_nodes | length ==
-    (emqx_cluster_seeds | length)
+    (groups['all'] | length)
   retries: 10
   delay: 5
   changed_when: false
+  when:
+    - emqx_discovery_strategy == "static" or
+      (emqx_discovery_strategy == "manual" and emqx_initial_hostname is defined)
 
 - name: Print cluster status on retry failure
   ansible.builtin.debug:
@@ -70,3 +81,6 @@
 - name: Display cluster status
   ansible.builtin.debug:
     var: cluster_status.stdout_lines
+  when:
+    - emqx_discovery_strategy == "static" or
+      (emqx_discovery_strategy == "manual" and emqx_initial_hostname is defined)

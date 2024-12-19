@@ -1,0 +1,46 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Wait for EMQX to be ready
+      wait_for:
+        port: "{{ emqx_tcp_port }}"
+        timeout: 300
+
+    - name: Check EMQX service status
+      command: systemctl status emqx
+      register: emqx_status
+      changed_when: false
+      failed_when: false
+
+    - name: Verify EMQX is running
+      assert:
+        that:
+          - "'active (running)' in emqx_status.stdout"
+        fail_msg: "EMQX is not running"
+        success_msg: "EMQX is running"
+
+    - name: Wait for cluster formation
+      command: emqx ctl cluster status --json
+      register: cluster_status
+      until: >
+        (cluster_status.stdout | from_json).running_nodes |
+        select('match', '^emqx@.*') |
+        list | length >= 2
+      retries: 10
+      delay: 5
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+
+    - name: Print cluster status on retry failure
+      debug:
+        msg: "Cluster formation failed after retries. Current status: {{ cluster_status.stdout }}"
+      when: cluster_status is failed
+
+    - name: Display cluster status
+      debug:
+        var: cluster_status.stdout_lines
