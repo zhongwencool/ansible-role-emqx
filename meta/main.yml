@@ -6,7 +6,7 @@ galaxy_info:
   author: zhongwencool
   description: Install and configure EMQX 5 broker cluster
   license: MIT
-  min_ansible_version: "2.10"
+  min_ansible_version: "2.18"
   platforms:
     - name: Ubuntu  # Ubuntu Linux distributions
       versions:

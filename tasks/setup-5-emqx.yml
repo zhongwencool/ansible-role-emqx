@@ -59,7 +59,6 @@
     - emqx_initial_hostname is defined
   changed_when: false
 
-
 - name: Wait for cluster formation
   ansible.builtin.command: emqx ctl cluster status --json
   register: cluster_status

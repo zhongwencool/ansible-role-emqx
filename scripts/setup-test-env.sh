@@ -17,10 +17,11 @@ pip install --upgrade pip
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -r .github/workflows/requirements.txt
 
 # Install required collections
 echo -e "\n${YELLOW}Installing required Ansible collections...${NC}"
-ansible-galaxy collection install -r meta/requirements.yml
+ansible-galaxy collection install -r meta/requirements_collections.yml
 
 # Run linting checks
 echo -e "\n${YELLOW}Running linting checks...${NC}"

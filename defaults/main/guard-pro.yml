@@ -2,7 +2,7 @@
 # Whether to enable Guard Pro
 # Values:
 #   true - Enable Guard Pro
-#   false - Skip Guard Pro
+#   false - Skip install Guard Pro
 emqx_guard_pro_enabled: true
 
 # License key for Guard Pro
