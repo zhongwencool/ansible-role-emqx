@@ -17,7 +17,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install --upgrade -r https://raw.githubusercontent.com/zhongwencool/ansible-role-emqx/main/requirements.txt
-curl -O https://raw.githubusercontent.com/zhongwencool/ansible-role-emqx/main/meta/requirments_collections.txt
+curl -O https://raw.githubusercontent.com/zhongwencool/ansible-role-emqx/main/meta/requirements_collections.yml
 ansible-galaxy install --force -r requirements_collections.yml
 rm -f requirements_collections.yml
 ```

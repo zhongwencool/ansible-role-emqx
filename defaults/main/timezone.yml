@@ -1,0 +1,8 @@
+# Timezone settings for EMQX node
+# Values:
+#   "Asia/Shanghai" - China Standard Time (CST)
+#   "UTC" - Coordinated Universal Time
+#   Any valid IANA timezone name (e.g. "America/New_York", "Europe/London")
+#
+# timezone: "Asia/Shanghai"
+# timezone: "UTC"
