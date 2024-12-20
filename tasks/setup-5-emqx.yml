@@ -52,12 +52,41 @@
     timeout: 3000
   when: emqx_tcp_port != 0
 
-- name: Join EMQX cluster manually when discovery strategy is manual
-  ansible.builtin.command: "emqx ctl cluster join emqx@{{ emqx_initial_hostname }}"
-  when:
-    - emqx_discovery_strategy == "manual"
-    - emqx_initial_hostname is defined
+- name: Wait for EMQX dashboard HTTP to be ready
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ emqx_dashboard_http_port }}/status"
+    method: GET
+    status_code: 200
+  register: dashboard_http_status
+  retries: 10
+  delay: 5
+  until: dashboard_http_status.status == 200
   changed_when: false
+  when: emqx_dashboard_http_port is defined and emqx_dashboard_http_port != 0
+
+- name: Wait for EMQX dashboard HTTPS to be ready
+  ansible.builtin.uri:
+    url: "https://127.0.0.1:{{ emqx_dashboard_https_port }}/status"
+    method: GET
+    status_code: 200
+  register: dashboard_https_status
+  retries: 10
+  delay: 5
+  until: dashboard_https_status.status == 200
+  changed_when: false
+  when: emqx_dashboard_https_port is defined and emqx_dashboard_https_port != 0
+
+- name: Join EMQX cluster manually when discovery strategy is manual
+  ansible.builtin.command: "emqx ctl cluster join emqx@{{ emqx_cluster_initial_hostname }}"
+  register: join_result
+  when:
+    - emqx_cluster_discovery_strategy == "manual"
+    - emqx_cluster_initial_hostname is defined
+  changed_when: false
+  failed_when: >
+    join_result.stdout is not search('Ignore') and
+    join_result.stdout is not search('successfully') and
+    join_result.stdout is not search('already_in_cluster')
 
 - name: Wait for cluster formation
   ansible.builtin.command: emqx ctl cluster status --json
@@ -69,8 +98,8 @@
   delay: 5
   changed_when: false
   when:
-    - emqx_discovery_strategy == "static" or
-      (emqx_discovery_strategy == "manual" and emqx_initial_hostname is defined)
+    - emqx_cluster_discovery_strategy == "static" or
+      (emqx_cluster_discovery_strategy == "manual" and emqx_cluster_initial_hostname is defined)
 
 - name: Print cluster status on retry failure
   ansible.builtin.debug:
@@ -81,5 +110,5 @@
   ansible.builtin.debug:
     var: cluster_status.stdout_lines
   when:
-    - emqx_discovery_strategy == "static" or
-      (emqx_discovery_strategy == "manual" and emqx_initial_hostname is defined)
+    - emqx_cluster_discovery_strategy == "static" or
+      (emqx_cluster_discovery_strategy == "manual" and emqx_cluster_initial_hostname is defined)

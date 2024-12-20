@@ -74,7 +74,7 @@
     immediate: yes
   with_nested:
     - "{{ emqx_cluster_ips }}"
-    - "{{ emqx_cluster_rpc_ports | default([4730, 5730]) }}"
+    - "{{ emqx_cluster_rpc_ports | default([4370, 5370]) }}"
   when:
     - ansible_os_family == "RedHat"
     - firewalld_check.rc == 0
@@ -88,7 +88,7 @@
     from_ip: "{{ item[0] }}"
   with_nested:
     - "{{ emqx_cluster_ips }}"
-    - "{{ emqx_cluster_rpc_ports | default([4730, 5730]) }}"
+    - "{{ emqx_cluster_rpc_ports | default([4370, 5370]) }}"
   when:
     - ansible_os_family == "Debian"
     - ufw_check.rc == 0
@@ -116,7 +116,7 @@
     comment: "EMQX cluster RPC port from {{ item[0] }}"
   with_nested:
     - "{{ emqx_cluster_ips }}"
-    - "{{ emqx_cluster_rpc_ports | default([4730, 5730]) }}"
+    - "{{ emqx_cluster_rpc_ports | default([4370, 5370]) }}"
   when: >
     (ansible_os_family == "RedHat" and firewalld_check.rc != 0) or
     (ansible_os_family == "Debian" and ufw_check.rc != 0)

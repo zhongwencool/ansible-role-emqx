@@ -12,7 +12,7 @@
 
     # Cluster configuration
     emqx_cluster_name: emqx_cluster
-    emqx_discovery_strategy: static
+    emqx_cluster_discovery_strategy: static
 
     # Port settings
     emqx_tcp_port: 1883

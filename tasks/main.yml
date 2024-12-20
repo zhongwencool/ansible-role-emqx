@@ -13,11 +13,6 @@
   ansible.builtin.include_tasks: setup-0-initial.yml
   tags: [initial]
 
-- name: Set timezone
-  timezone:
-    name: "{{ timezone }}"
-  when: timezone | length > 0
-
 - name: Include sysctl tasks
   ansible.builtin.include_tasks: setup-1-sysctl.yml
   when: emqx_sysctl_enabled | default(true) | bool

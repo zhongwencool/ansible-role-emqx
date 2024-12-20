@@ -59,15 +59,16 @@ provisioner:
   inventory:
     group_vars:
       all:
-        emqx_cookie: "molecule_manual_cookie"
+        emqx_node_cookie: "molecule_manual_cookie"
         ansible_user: root
-        emqx_tcp_port: 1883
+        emqx_tcp_port: 2883
         emqx_ssl_port: 8883
-        emqx_ws_port: 8083
-        emqx_wss_port: 8084
-        emqx_dashboard_port: 18083
-        emqx_discovery_strategy: manual
-        emqx_initial_hostname: "manual1.molecule"
+        emqx_ws_port: 0
+        emqx_wss_port: 0
+        emqx_dashboard_http_port: 18083
+        emqx_cluster_discovery_strategy: manual
+        emqx_cluster_initial_hostname: "manual1.molecule"
+        timezone: "Asia/Shanghai"
     host_vars:
       "emqx1-test":
         emqx_hostname: "manual1.molecule"

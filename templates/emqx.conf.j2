@@ -1,21 +1,25 @@
 ## TODO: add explanation url to emqx docs
 node {
     name = "emqx@{{ emqx_hostname }}"
-    cookie = "{{ emqx_cookie }}"
+    cookie = "{{ emqx_node_cookie }}"
     data_dir = "/var/lib/emqx"
 }
 
+{%- if emqx_cluster_discovery_strategy == "etcd" %}
 cluster {
-    name = "{{ emqx_cluster_name }}"
-    discovery_strategy = "{{ emqx_discovery_strategy }}"
-    {% if emqx_discovery_strategy == "etcd" %}
+    name = "{{ emqx_cluster_name | default('emqxcl') }}"
+    discovery_strategy = "{{ emqx_cluster_discovery_strategy }}"
     etcd {
         servers = "{{ emqx_etcd_servers | join(',') }}"
         prefix = "{{ emqx_etcd_prefix }}"
         node_ttl = "{{ emqx_etcd_node_ttl }}"
     }
-    {% endif %}
-    {% if emqx_discovery_strategy == "static" %}
+{%- endif %}
+
+{% if emqx_cluster_discovery_strategy == "static" %}
+cluster {
+    name = "{{ emqx_cluster_name | default('emqxcl') }}"
+    discovery_strategy = "{{ emqx_cluster_discovery_strategy }}"
     static {
         seeds = [
             {% for host in emqx_cluster_seeds %}
@@ -23,32 +27,82 @@ cluster {
             {% endfor %}
         ]
     }
-    {% endif %}
+}
+{% endif %}
+
+{% if emqx_cluster_discovery_strategy == "manual" %}
+cluster {
+    name = "{{ emqx_cluster_name | default('emqxcl') }}"
+    discovery_strategy = "{{ emqx_cluster_discovery_strategy }}"
+}
+{% endif %}
+
+dashboard {
+    {% if emqx_dashboard.http_port != 0 %}
+    listeners.http.bind = {{ emqx_dashboard.http_port }}
+    {%- endif %}
+    {% if emqx_dashboard.https_port != 0 %}
+    listeners.https {
+        bind = {{ emqx_dashboard.https_port }}
+        ssl_options {
+            certfile = "{{ emqx_dashboard.https_certfile }}"
+            keyfile = "{{ emqx_dashboard.https_keyfile }}"
+            cacertfile = "{{ emqx_dashboard.https_cacertfile }}"
+        }
+    }
+    {%- endif %}
+    swagger_support = {{ emqx_dashboard.swagger_support | default(true) | lower }}
+
 }
 
+{% if emqx_tcp_port != 0 %}
 listeners.tcp.default {
-    bind = "0.0.0.0:{{ emqx_tcp_port }}"
+    bind = {{ emqx_tcp_port }}
+    proxy_protocol = {{ emqx_tcp_proxy_protocol | default(false) | lower }}
     max_connections = infinity
 }
+{% endif %}
+{% if emqx_tcp_port == 0 %}
+listeners.tcp.default = marked_for_deletion
+{% endif %}
 
-{% if emqx_ssl_enabled %}
+{% if emqx_ssl_port != 0 %}
 listeners.ssl.default {
-    bind = "0.0.0.0:{{ emqx_ssl_port }}"
+    bind = {{ emqx_ssl_port }}
     ssl_options {
         certfile = "{{ emqx_ssl_certfile }}"
         keyfile = "{{ emqx_ssl_keyfile }}"
+        cacertfile = "{{ emqx_ssl_cacertfile }}"
     }
     max_connections = infinity
 }
 {% endif %}
+{% if emqx_ssl_port == 0 %}
+listeners.ssl.default = marked_for_deletion
+{% endif %}
 
+{% if emqx_ws_port != 0 %}
 listeners.ws.default {
-    bind = "0.0.0.0:{{ emqx_ws_port }}"
+    bind = {{ emqx_ws_port }}
     max_connections = infinity
 }
+{% endif %}
+{% if emqx_ws_port == 0 %}
+listeners.ws.default = marked_for_deletion
+{% endif %}
 
-dashboard {
-    listeners.http {
-        bind = "0.0.0.0:{{ emqx_dashboard_port }}"
+{% if emqx_wss_port != 0 %}
+listeners.wss.default {
+    bind = {{ emqx_wss_port }}
+    max_connections = infinity
+    ssl_options {
+        certfile = "{{ emqx_wss_certfile }}"
+        keyfile = "{{ emqx_wss_keyfile }}"
+        cacertfile = "{{ emqx_wss_cacertfile }}"
     }
-} 
+}
+{% endif %}
+{% if emqx_wss_port == 0 %}
+listeners.wss.default = marked_for_deletion
+{% endif %}
+

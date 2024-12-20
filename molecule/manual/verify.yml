@@ -23,6 +23,46 @@
         fail_msg: "EMQX is not running"
         success_msg: "EMQX is running"
 
+    - name: Wait for EMQX dashboard HTTP to be ready
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ emqx_dashboard_http_port }}/status"
+        method: GET
+        status_code: 200
+      register: dashboard_http_status
+      retries: 10
+      delay: 5
+      until: dashboard_http_status.status == 200
+      changed_when: false
+      when: emqx_dashboard_http_port is defined and emqx_dashboard_http_port != 0
+
+    - name: Verify EMQX dashboard HTTP is accessible
+      ansible.builtin.assert:
+        that:
+          - dashboard_http_status.status == 200
+        fail_msg: "EMQX dashboard HTTP is not accessible"
+        success_msg: "EMQX dashboard HTTP is accessible"
+      when: emqx_dashboard_http_port is defined and emqx_dashboard_http_port != 0
+
+    - name: Wait for EMQX dashboard HTTPS to be ready
+      ansible.builtin.uri:
+        url: "https://127.0.0.1:{{ emqx_dashboard_https_port }}/status"
+        method: GET
+        status_code: 200
+      register: dashboard_https_status
+      retries: 10
+      delay: 5
+      until: dashboard_https_status.status == 200
+      changed_when: false
+      when: emqx_dashboard_https_port is defined and emqx_dashboard_https_port != 0
+
+    - name: Verify EMQX dashboard HTTPS is accessible
+      ansible.builtin.assert:
+        that:
+          - dashboard_https_status.status == 200
+        fail_msg: "EMQX dashboard HTTPS is not accessible"
+        success_msg: "EMQX dashboard HTTPS is accessible"
+      when: emqx_dashboard_https_port is defined and emqx_dashboard_https_port != 0
+
     - name: Wait for cluster formation
       command: emqx ctl cluster status --json
       register: cluster_status

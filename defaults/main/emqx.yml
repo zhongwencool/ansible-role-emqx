@@ -5,60 +5,73 @@ emqx_version: "5.8.3"
 # Hostname settings
 emqx_hostname: "{{ inventory_hostname }}"
 
-# EMQX Configuration
-emqx_cookie: "emqxsecretcookie"
+# https://docs.emqx.com/en/emqx/v5.8.3/hocon/#V-dashboard
+emqx_dashboard:
+  swagger_support: true
+  http_port: 18083
+  https_port: 0
+  https_certfile: ""
+  https_keyfile: ""
+  https_cacertfile: ""
 
-# EMQX cluster settings
-emqx_cluster_name: emqx_cluster
+## TCP/TLS/WebSocket/WSS
+# The listener is disabled if port is 0
+# https://docs.emqx.com/en/emqx/v5.8.3/hocon/#V-listeners
+
+emqx_tcp_port: 1883
+emqx_tcp_proxy_protocol: false
+
+emqx_ssl_port: 8883
+emqx_ssl_certfile: "${EMQX_ETC_DIR}/certs/cert.pem"
+emqx_ssl_keyfile: "${EMQX_ETC_DIR}/certs/key.pem"
+emqx_ssl_cacertfile: "${EMQX_ETC_DIR}/certs/cacert.pem"
+
+emqx_ws_port: 8083
+emqx_ws_proxy_protocol: false
+
+emqx_wss_port: 8084
+emqx_wss_certfile: "${EMQX_ETC_DIR}/certs/cert.pem"
+emqx_wss_keyfile: "${EMQX_ETC_DIR}/certs/key.pem"
+emqx_wss_cacertfile: "${EMQX_ETC_DIR}/certs/cacert.pem"
+
+# EMQX Configuration
+# Secret cookie is a random string that should be the same on all nodes
+# in the given EMQX cluster, but unique per EMQX cluster.
+# It is used to prevent EMQX nodes that belong to different clusters
+# from accidentally connecting to each other.
+# This should be a random string, unique per cluster
+# Default value is not secure - please change in production
+emqx_node_cookie: "emqxsecretcookie"
 
 # Static discovery settings
 # When using static discovery, Ansible will automatically collect all deployed nodes in the cluster
 # No need to manually configure static_nodes list
 # This is the simplest discovery method and works well for fixed cluster configurations
-emqx_discovery_strategy: static
+emqx_cluster_discovery_strategy: static
 
 # Manual discovery settings
-# When using manual discovery, Ansible will automatically make all other nodes join the emqx_initial_host node
-# This is useful when you want to explicitly control which node other nodes should join
-# emqx_discovery_strategy: manual
+# When using manual discovery, Ansible will automatically make
+# all other nodes join the emqx_initial_host node
+# This is useful when you want to explicitly control
+# which node other nodes should join
+# emqx_cluster_discovery_strategy: manual
 # emqx_initial_hostname: s1.emqx.dev  # The hostname that other nodes will join
 
 # etcd discovery settings
-# When using etcd discovery, EMQX nodes will register themselves in etcd and discover other nodes
+# When using etcd discovery, EMQX nodes will register themselves in
+# etcd and discover other nodes
 # This is useful for dynamic cluster configurations where nodes may come and go
-# emqx_discovery_strategy: etcd
 
-# List of etcd servers to connect to
-emqx_etcd_servers:
+# emqx_cluster_discovery_strategy: etcd
+emqx_cluster_etcd_servers:
   - http://etcd-server-1:2379
   - http://etcd-server-2:2379
   - http://etcd-server-3:2379
 
 # Prefix used for EMQX keys stored in etcd
 # All EMQX cluster data will be stored under this prefix
-emqx_etcd_prefix: emqxctl
+emqx_cluster_etcd_prefix: emqxctl
 
-# Time-to-live for node registration in etcd
-# Nodes must refresh their registration within this time period
-# or they will be considered offline
-emqx_etcd_node_ttl: 90s
-
-# EMQX cluster ports
-# These ports are used for inter-node communication in the EMQX cluster
-# List of required ports:
-#   - 4370: Used for EMQX distributed Erlang port mapping and inter-node RPC calls
-#   - 5370: Used for EMQX distributed node discovery and cluster formation
-emqx_cluster_rpc_ports:
-  - 4370
-  - 5370
-
-emqx_tcp_port: 1883
-emqx_ssl_port: 8883
-emqx_ws_port: 8083
-emqx_wss_port: 8084
-emqx_dashboard_port: 18083
-
-# SSL/TLS Configuration
-emqx_ssl_enabled: false
-emqx_ssl_certfile: ""
-emqx_ssl_keyfile: ""
+# Expiration time of the etcd key associated with the node.
+# It is refreshed automatically, as long as the node is alive.
+emqx_cluster_etcd_node_ttl: 90s

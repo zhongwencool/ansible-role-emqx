@@ -18,7 +18,7 @@
   ansible.builtin.set_fact:
     emqx_cluster_seeds: >-
       [{%- for host in groups['all'] -%}'emqx@{{ hostvars[host].emqx_hostname }}'{%- if not loop.last -%},{%- endif -%}{%- endfor -%}]
-  when: emqx_discovery_strategy == "static"
+  when: emqx_cluster_discovery_strategy == "static"
 
 - name: Ensure EMQX group exists
   ansible.builtin.group:
@@ -133,3 +133,8 @@
 - name: Set locale variable with fallback
   ansible.builtin.set_fact:
     effective_locale: "{{ emqx_locale if locale_check.rc == 0 else 'C.UTF-8' }}"
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+  when: timezone is defined

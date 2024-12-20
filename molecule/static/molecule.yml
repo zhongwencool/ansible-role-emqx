@@ -59,14 +59,15 @@ provisioner:
   inventory:
     group_vars:
       all:
-        emqx_cookie: "molecule_static_cookie"
+        emqx_node_cookie: "molecule_static_cookie"
         ansible_user: root
         emqx_tcp_port: 1883
         emqx_ssl_port: 8883
-        emqx_ws_port: 8083
-        emqx_wss_port: 8084
-        emqx_dashboard_port: 18083
-        emqx_discovery_strategy: static
+        emqx_ws_port: 0
+        emqx_wss_port: 0
+        emqx_dashboard_http_port: 18083
+        emqx_cluster_discovery_strategy: static
+        timezone: "America/New_York"
     host_vars:
       "emqx1-test":
         emqx_hostname: "static1.molecule"

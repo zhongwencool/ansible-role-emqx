@@ -75,5 +75,6 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - Web interface for inventory generation
 - host generator.
+
 - SSL certificate management
-- Backup/restore functionality (as plugin)
+- Backup/restore functionality (as guard pro plugin)
