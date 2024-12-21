@@ -54,23 +54,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           # Set MOLECULE_IMAGE based on the distro
-          if [ "${{ matrix.distro }}" = "amazonlinux2" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-amazonlinux2-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "amazonlinux2023" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-amazonlinux2023-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "debian11" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian11-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "debian12" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian12-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2004" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2004-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2204" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2204-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux8" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux8-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux9" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux9-ansible:latest"
-          fi
+          export MOLECULE_IMAGE="geerlingguy/docker-${{ matrix.distro }}-ansible:latest"
           for i in {1..2}; do
             echo "Attempt static $i of 2"
             if MOLECULE_DISTRO=${{ matrix.distro }} molecule -vv test -s static; then
@@ -141,23 +125,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           # Set MOLECULE_IMAGE based on the distro
-          if [ "${{ matrix.distro }}" = "amazonlinux2" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2"
-          elif [ "${{ matrix.distro }}" = "amazonlinux2023" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2023"
-          elif [ "${{ matrix.distro }}" = "debian11" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian11-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "debian12" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian12-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2004" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2004-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2204" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2204-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux8" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux8-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux9" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux9-ansible:latest"
-          fi
+          export MOLECULE_IMAGE="geerlingguy/docker-${{ matrix.distro }}-ansible:latest"
           for i in {1..2}; do
             echo "Attempt manual $i of 2"
             if MOLECULE_DISTRO=${{ matrix.distro }} molecule -vv test -s manual; then
@@ -228,23 +196,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           # Set MOLECULE_IMAGE based on the distro
-          if [ "${{ matrix.distro }}" = "amazonlinux2" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2"
-          elif [ "${{ matrix.distro }}" = "amazonlinux2023" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2023"
-          elif [ "${{ matrix.distro }}" = "debian11" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian11-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "debian12" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-debian12-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2004" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2004-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "ubuntu2204" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-ubuntu2204-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux8" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux8-ansible:latest"
-          elif [ "${{ matrix.distro }}" = "rockylinux9" ]; then
-            export MOLECULE_IMAGE="geerlingguy/docker-rockylinux9-ansible:latest"
-          fi
+          export MOLECULE_IMAGE="geerlingguy/docker-${{ matrix.distro }}-ansible:latest"
           for i in {1..2}; do
             echo "Attempt uninstall $i of 2"
             if MOLECULE_DISTRO=${{ matrix.distro }} molecule -vv test -s uninstall; then
