@@ -1,0 +1,9 @@
+---
+# ansible-playbook playbook-uninstall.yml -i inventory/hosts.yml
+
+- name: Uninstall EMQX
+  hosts: all
+  become: true
+  tasks:
+    - name: Uninstall EMQX
+      ansible.builtin.include_tasks: ../../ansible-role-emqx/tasks/uninstall.yml

@@ -24,3 +24,4 @@
 
 - name: Setup EMQX package
   ansible.builtin.include_tasks: packages/debian.yml
+  tags: [emqx]

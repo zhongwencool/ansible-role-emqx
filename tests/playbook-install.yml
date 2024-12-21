@@ -1,6 +1,8 @@
 ---
+# ansible-playbook playbook-install.yml -i inventory/hosts.yml
+
 - name: Test EMQX Installation
-  hosts: emqx_test
+  hosts: emqx-test
   gather_facts: yes
 
   pre_tasks:
@@ -8,36 +10,12 @@
       ansible.builtin.debug:
         msg: "Role path: {{ playbook_dir }}/.."
 
-    - name: Update apt cache (Debian/Ubuntu)
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 1
-        autoclean: true
-        autoremove: true
-        clean: true
-        fail_on_autoremove: true
-      when: ansible_os_family == "Debian"
-
-    - name: Check locale settings
-      ansible.builtin.command: locale
-      register: locale_check
-      changed_when: false
-
     - name: Debug connection info
       ansible.builtin.debug:
         msg:
           - "Python interpreter: {{ ansible_python_interpreter }}"
           - "Become method: {{ ansible_become_method }}"
           - "User: {{ ansible_user }}"
-
-    - name: Test sudo access
-      ansible.builtin.command: whoami
-      register: whoami_result
-      become: yes
-
-    - name: Display sudo test result
-      ansible.builtin.debug:
-        var: whoami_result.stdout
 
   roles:
     - role: "../../ansible-role-emqx"
@@ -58,3 +36,4 @@
         port: "{{ emqx_tcp_port }}"
         timeout: 5
         state: started
+      when: emqx_tcp_port != 0

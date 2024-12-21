@@ -11,19 +11,14 @@
     emqx_service_enabled: true
 
     # Cluster configuration
-    emqx_cluster_name: emqx_cluster
     emqx_cluster_discovery_strategy: static
 
     # Port settings
     emqx_tcp_port: 1883
     emqx_ssl_port: 8883
-    emqx_ws_port: 8083
-    emqx_dashboard_port: 18083
-
-    # SSL settings (if needed)
-    emqx_ssl_enabled: false
-    # emqx_ssl_certfile: "/path/to/cert.pem"
-    # emqx_ssl_keyfile: "/path/to/key.pem"
+    emqx_ws_port: 0
+    emqx_wss_port: 0
+    emqx_dashboard_http_port: 18083
 
   roles:
     - role: ../../ansible-role-emqx

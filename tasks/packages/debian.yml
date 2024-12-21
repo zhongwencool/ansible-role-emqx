@@ -45,3 +45,4 @@
   ansible.builtin.apt:
     deb: "{{ pkg_path }}"
     state: present
+  become: true

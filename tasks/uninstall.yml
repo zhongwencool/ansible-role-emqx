@@ -7,6 +7,24 @@
     enabled: false
   failed_when: false
 
+- name: Purge EMQX completely including configuration files
+  ansible.builtin.apt:
+    name: emqx
+    state: absent
+    purge: yes
+    autoremove: yes
+  become: true
+  when: ansible_os_family == 'Debian'
+  failed_when: false
+
+- name: Purge EMQX completely including configuration files
+  ansible.builtin.dnf:
+    name: emqx
+    state: absent
+    autoremove: yes
+  become: true
+  when: ansible_os_family == 'RedHat'
+
 - name: Remove EMQX package
   ansible.builtin.package:
     name: emqx
@@ -24,7 +42,6 @@
     - /var/log/emqx
     - /usr/lib/emqx
     - /tmp/emqx-{{ emqx_version }}
-    - /tmp/emqx-plugins
 
 - name: Remove repository configuration
   ansible.builtin.file:
@@ -32,18 +49,21 @@
     state: absent
   vars:
     repo_path: >-
-      {{
-        '/etc/apt/sources.list.d/emqx.list'
-        if ansible_os_family == 'Debian'
-        else '/etc/yum.repos.d/emqx.repo'
-      }}
+      {%- if ansible_os_family == 'Debian' -%}
+      /etc/apt/sources.list.d/emqx.list
+      {%- else -%}
+      /etc/yum.repos.d/emqx.repo
+      {%- endif -%}
 
-- name: Clean package cache
-  ansible.builtin.command: "{{ cache_clean_cmd }}"
-  environment:
-    LANG: C
-    LC_ALL: C
-  vars:
-    cache_clean_cmd: >-
-      {{ 'apt-get clean' if ansible_os_family == 'Debian' else 'yum clean all' }}
-  changed_when: false
+- name: Remove APT cache
+  ansible.builtin.file:
+    path: /var/lib/apt/lists/
+    state: absent
+  when: ansible_os_family == 'Debian'
+
+- name: Recreate APT cache directory
+  ansible.builtin.file:
+    path: /var/lib/apt/lists/
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == 'Debian'

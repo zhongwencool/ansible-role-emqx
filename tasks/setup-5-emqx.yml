@@ -1,14 +1,4 @@
 ---
-- name: Ensure EMQX directories have correct ownership
-  ansible.builtin.file:
-    path: "{{ item }}"
-    owner: emqx
-    group: emqx
-    recurse: yes
-  with_items:
-    - /etc/emqx
-    - /var/lib/emqx
-    - /var/log/emqx
 
 - name: Configure EMQX service restart settings
   ansible.builtin.lineinfile:

@@ -71,10 +71,10 @@ Available variables are listed below, along with default values (see `defaults/m
 
 ## TODO
 - Update configuration interface
-- upload to ansible-galaxy
+- ci auto upload to ansible-galaxy when tag?
 
-- Web interface for inventory generation
-- host generator.
+- Web site for host inventory generation
+- playbook cli generator.
 
-- SSL certificate management
-- Backup/restore functionality (as guard pro plugin)
+- SSL certificate management(as guard plugin)
+- Backup/restore functionality (as guard plugin)

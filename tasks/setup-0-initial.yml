@@ -35,6 +35,17 @@
     system: yes
     state: present
 
+- name: Ensure EMQX directories have correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: emqx
+    group: emqx
+    recurse: yes
+  with_items:
+    - /etc/emqx
+    - /var/lib/emqx
+    - /var/log/emqx
+
 - name: Get container info
   ansible.builtin.set_fact:
     container_info: |

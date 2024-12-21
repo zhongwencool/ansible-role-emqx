@@ -29,6 +29,7 @@
 
 - name: Include OS-specific tasks
   ansible.builtin.include_tasks: "setup-4-{{ ansible_os_family | lower }}.yml"
+  tags: [emqx]
 
 - name: Include EMQX-Setup tasks
   ansible.builtin.include_tasks: setup-5-emqx.yml
