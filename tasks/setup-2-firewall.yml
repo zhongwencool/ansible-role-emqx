@@ -25,6 +25,18 @@
     - firewalld_check.rc == 0
   tags: ['firewall']
 
+- name: Disable IPv6 in UFW for Ubuntu 20.04
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^IPV6='
+    line: 'IPV6=no'
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version == "20.04"
+    - ufw_check.rc == 0
+  tags: ['firewall']
+
 - name: Ensure UFW is enabled (Debian family)
   community.general.ufw:
     state: enabled
@@ -94,7 +106,16 @@
     - ufw_check.rc == 0
   tags: ['firewall']
 
-- name: Ensure iptables packages are installed
+- name: Ensure iptables packages are installed (RedHat family)
+  ansible.builtin.package:
+    name: iptables
+    state: present
+  when: >
+    ansible_os_family == "RedHat" and
+    firewalld_check.rc != 0
+  tags: ['firewall']
+
+- name: Ensure iptables packages are installed (Debian family)
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
@@ -102,8 +123,8 @@
     - iptables
     - iptables-persistent
   when: >
-    (ansible_os_family == "RedHat" and firewalld_check.rc != 0) or
-    (ansible_os_family == "Debian" and ufw_check.rc != 0)
+    ansible_os_family == "Debian" and
+    ufw_check.rc != 0
   tags: ['firewall']
 
 - name: Configure iptables

@@ -79,6 +79,14 @@
   when: container_info is defined
   changed_when: false
 
+- name: Remove curl-minimal package if present
+  ansible.builtin.dnf:
+    name: curl-minimal
+    state: absent
+  when: >
+    ansible_distribution_major_version == '9' or
+    (ansible_distribution == 'Amazon' and ansible_distribution_version == '2023')
+
 - name: Install required dependencies for Debian
   ansible.builtin.apt:
     name:
@@ -103,22 +111,29 @@
     verbosity: 1
   when: ansible_os_family == 'Debian'
 
-- name: Install required dependencies for RedHat
+- name: Install required dependencies for RedHat with DNF
   ansible.builtin.dnf:
     name:
       - openssl-devel
       - ncurses-devel
       - curl
       - wget
-      - tar
-      - gzip
       - firewalld
       - chrony
-    state: present
-    update_cache: true
-  register: dnf_install_deps_result
-  become: true
-  when: ansible_os_family == 'RedHat'
+    use_backend: dnf4
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'dnf'
+
+- name: Install required dependencies for RedHat with YUM
+  ansible.builtin.yum:
+    name:
+      - openssl-devel
+      - ncurses-devel
+      - curl
+      - wget
+      - firewalld
+      - chrony
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'yum'
+  # noqa fqcn[action-core]
 
 - name: Display package installation results
   ansible.builtin.debug:
@@ -132,6 +147,20 @@
     hostname "{{ emqx_hostname }}"
   when: ansible_service_mgr != 'systemd' or ansible_virtualization_type == 'docker'
   changed_when: false
+
+- name: Debug service manager and virtualization type
+  ansible.builtin.debug:
+    msg: >
+      Service Manager: {{ ansible_service_mgr }}
+      Virtualization Type: {{ ansible_virtualization_type }}
+      test: {{ ansible_distribution_version }}
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "{{ emqx_hostname }}"
+  become: true
+  when: >
+    ansible_virtualization_type not in ['docker', 'container']
 
 - name: Check if requested locale is available
   ansible.builtin.shell: |
