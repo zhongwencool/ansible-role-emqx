@@ -73,8 +73,3 @@ Available variables are listed below, along with default values (see `defaults/m
 - Update configuration interface
 - ci auto upload to ansible-galaxy when tag?
 
-- Web site for host inventory generation
-- playbook cli generator.
-
-- SSL certificate management(as guard plugin)
-- Backup/restore functionality (as guard plugin)

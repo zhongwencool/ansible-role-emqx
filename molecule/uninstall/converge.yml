@@ -1,0 +1,76 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Update package cache (Debian)
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == 'Debian'
+
+  tasks:
+    - name: First install EMQX
+      ansible.builtin.include_role:
+        name: ansible-role-emqx
+
+    - name: Wait for EMQX to be ready
+      wait_for:
+        port: {{ emqx_tcp_port }}
+        timeout: 3000
+
+    - name: Then uninstall EMQX
+      ansible.builtin.include_tasks:
+        file: ../../tasks/uninstall.yml
+
+    - name: Check if EMQX service exists
+      ansible.builtin.command: systemctl status emqx
+      register: emqx_status
+      failed_when: false
+      changed_when: false
+
+    - name: Verify EMQX service is not running
+      ansible.builtin.assert:
+        that:
+          - emqx_status.rc != 0
+        fail_msg: "EMQX service still exists"
+        success_msg: "EMQX service is removed"
+
+    - name: Check if EMQX directories exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: dir_check
+      loop:
+        - /etc/emqx
+        - /var/lib/emqx
+        - /var/log/emqx
+        - /usr/lib/emqx
+
+    - name: Verify EMQX directories are removed
+      ansible.builtin.assert:
+        that:
+          - not item.stat.exists
+        fail_msg: "Directory {{ item.item }} still exists"
+        success_msg: "Directory {{ item.item }} is removed"
+      loop: "{{ dir_check.results }}"
+
+    - name: Check if repository files exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: repo_check
+      loop:
+        - /etc/apt/sources.list.d/emqx.list
+        - /etc/yum.repos.d/emqx.repo
+
+    - name: Verify repository files are removed
+      ansible.builtin.assert:
+        that:
+          - not item.stat.exists
+        fail_msg: "Repository file {{ item.item }} still exists"
+        success_msg: "Repository file {{ item.item }} is removed"
+      loop: "{{ repo_check.results }}"
+
+    - name: Install EMQX again
+      ansible.builtin.include_role:
+        name: ansible-role-emqx
