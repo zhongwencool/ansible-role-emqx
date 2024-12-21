@@ -111,22 +111,28 @@
     verbosity: 1
   when: ansible_os_family == 'Debian'
 
-- name: Install required dependencies for RedHat
+- name: Install required dependencies for RedHat with DNF
   ansible.builtin.dnf:
     name:
       - openssl-devel
       - ncurses-devel
       - curl
       - wget
-      - tar
-      - gzip
       - firewalld
       - chrony
-    state: present
-    update_cache: true
-  register: dnf_install_deps_result
-  become: true
-  when: ansible_os_family == 'RedHat'
+    use_backend: dnf4
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'dnf'
+
+- name: Install required dependencies for RedHat with YUM
+  ansible.builtin.yum:
+    name:
+      - openssl-devel
+      - ncurses-devel
+      - curl
+      - wget
+      - firewalld
+      - chrony
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'yum'
 
 - name: Display package installation results
   ansible.builtin.debug:
