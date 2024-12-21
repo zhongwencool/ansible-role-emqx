@@ -22,8 +22,18 @@
     name: emqx
     state: absent
     autoremove: yes
+    use_backend: dnf4
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'dnf'
   become: true
-  when: ansible_os_family == 'RedHat'
+
+- name: Purge EMQX completely including configuration files
+  ansible.builtin.yum:
+    name: emqx
+    state: absent
+    autoremove: yes
+  when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'yum'
+  become: true
+  # noqa fqcn[action-core]
 
 - name: Remove EMQX package
   ansible.builtin.package:

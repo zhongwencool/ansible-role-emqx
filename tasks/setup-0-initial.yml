@@ -133,6 +133,7 @@
       - firewalld
       - chrony
   when: ansible_os_family == 'RedHat' and ansible_pkg_mgr == 'yum'
+  # noqa fqcn[action-core]
 
 - name: Display package installation results
   ansible.builtin.debug:

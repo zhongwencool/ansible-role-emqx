@@ -199,7 +199,7 @@ jobs:
           export MOLECULE_IMAGE="geerlingguy/docker-${{ matrix.distro }}-ansible:latest"
           for i in {1..2}; do
             echo "Attempt uninstall $i of 2"
-            if MOLECULE_DISTRO=${{ matrix.distro }} molecule -vv test -s uninstall; then
+            if MOLECULE_DISTRO=${{ matrix.distro }} molecule -vvv test -s uninstall; then
               break
             fi
             if [ $i -eq 2 ]; then
