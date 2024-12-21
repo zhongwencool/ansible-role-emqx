@@ -79,6 +79,10 @@ jobs:
             if MOLECULE_DISTRO=${{ matrix.distro }} molecule test -s uninstall; then
               break
             fi
+            if [ $i -eq 3 ]; then
+              echo "All 3 attempts for uninstall scenario failed"
+              exit 1
+            fi
             echo "Attempt uninstall $i failed, retrying..."
             sleep 15
           done
