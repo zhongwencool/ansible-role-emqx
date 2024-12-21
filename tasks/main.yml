@@ -24,7 +24,9 @@
 
 - name: Include chrony tasks
   ansible.builtin.include_tasks: setup-3-chrony.yml
-  when: emqx_chrony_enabled | default(true) | bool
+  when:
+    - emqx_chrony_enabled | default(true) | bool
+    - ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
   tags: [chrony]
 
 - name: Include OS-specific tasks

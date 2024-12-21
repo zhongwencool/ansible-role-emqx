@@ -28,7 +28,6 @@
     name: "{{ emqx_hostname }}"
   become: true
   when: >
-    ansible_service_mgr == 'systemd' and
     ansible_virtualization_type not in ['docker', 'container']
 
 - name: Setup EMQX package
