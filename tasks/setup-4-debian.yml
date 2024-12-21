@@ -21,6 +21,7 @@
     msg: >
       Service Manager: {{ ansible_service_mgr }}
       Virtualization Type: {{ ansible_virtualization_type }}
+      test: {{ ansible_distribution_version }}
 
 - name: Set a hostname specifying strategy
   ansible.builtin.hostname:
