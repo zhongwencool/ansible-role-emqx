@@ -55,9 +55,9 @@ jobs:
           source venv/bin/activate
           # Set MOLECULE_IMAGE based on the distro
           if [ "${{ matrix.distro }}" = "amazonlinux2" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2"
+            export MOLECULE_IMAGE="geerlingguy/docker-amazonlinux2-ansible:latest"
           elif [ "${{ matrix.distro }}" = "amazonlinux2023" ]; then
-            export MOLECULE_IMAGE="amazonlinux:2023"
+            export MOLECULE_IMAGE="geerlingguy/docker-amazonlinux2023-ansible:latest"
           elif [ "${{ matrix.distro }}" = "debian11" ]; then
             export MOLECULE_IMAGE="geerlingguy/docker-debian11-ansible:latest"
           elif [ "${{ matrix.distro }}" = "debian12" ]; then

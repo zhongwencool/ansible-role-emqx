@@ -25,6 +25,18 @@
     - firewalld_check.rc == 0
   tags: ['firewall']
 
+- name: Disable IPv6 in UFW for Ubuntu 20.04
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^IPV6='
+    line: 'IPV6=no'
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version == "20.04"
+    - ufw_check.rc == 0
+  tags: ['firewall']
+
 - name: Ensure UFW is enabled (Debian family)
   community.general.ufw:
     state: enabled

@@ -11,14 +11,6 @@
     group: root
     mode: '0644'
 
-- name: Remove curl-minimal package if present
-  ansible.builtin.dnf:
-    name: curl-minimal
-    state: absent
-  when: >
-    ansible_distribution_major_version == '9' or
-    (ansible_distribution == 'Amazon' and ansible_distribution_version == '2023')
-
 - name: Debug service manager and virtualization type
   ansible.builtin.debug:
     msg: >

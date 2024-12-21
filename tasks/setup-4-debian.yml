@@ -16,6 +16,12 @@
   changed_when: false
   when: ansible_os_family == "Debian"
 
+- name: Debug service manager and virtualization type
+  ansible.builtin.debug:
+    msg: >
+      Service Manager: {{ ansible_service_mgr }}
+      Virtualization Type: {{ ansible_virtualization_type }}
+
 - name: Set a hostname specifying strategy
   ansible.builtin.hostname:
     name: "{{ emqx_hostname }}"
