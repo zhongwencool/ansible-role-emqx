@@ -141,6 +141,20 @@
   when: ansible_service_mgr != 'systemd' or ansible_virtualization_type == 'docker'
   changed_when: false
 
+- name: Debug service manager and virtualization type
+  ansible.builtin.debug:
+    msg: >
+      Service Manager: {{ ansible_service_mgr }}
+      Virtualization Type: {{ ansible_virtualization_type }}
+      test: {{ ansible_distribution_version }}
+
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "{{ emqx_hostname }}"
+  become: true
+  when: >
+    ansible_virtualization_type not in ['docker', 'container']
+
 - name: Check if requested locale is available
   ansible.builtin.shell: |
     set -o pipefail

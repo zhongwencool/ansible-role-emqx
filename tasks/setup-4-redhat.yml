@@ -11,17 +11,5 @@
     group: root
     mode: '0644'
 
-- name: Debug service manager and virtualization type
-  ansible.builtin.debug:
-    msg: >
-      Service Manager: {{ ansible_service_mgr }}
-      Virtualization Type: {{ ansible_virtualization_type }}
-
-- name: Set a hostname specifying strategy
-  ansible.builtin.hostname:
-    name: "{{ emqx_hostname }}"
-  become: true
-  when: ansible_service_mgr == 'systemd' and ansible_virtualization_type != 'docker'
-
 - name: Setup EMQX package
   ansible.builtin.include_tasks: packages/redhat.yml
